@@ -1,0 +1,49 @@
+{
+  "completion_scope": "automated_experiment_with_agent_review",
+  "decision_date": "2026-11-05",
+  "user_instruction": "就按 agent 审核如实写，不做真人标注和重标，继续完成剩下的实验。",
+  "human_validation_required": false,
+  "human_annotation_status": "not_requested",
+  "delayed_human_retest_status": "not_requested",
+  "data_sha256": "25d4e755d9c76e6163e5c9efca0e472ec649c195dbe6d019ec12beca482cb190",
+  "pairs_sha256": "c41e5226fa915b691e9e15b4967072fdd9e3e36716a001e129cbebaff3c91483",
+  "agent_review": {
+    "reviewer_type": "agent",
+    "pointwise_cases": 200,
+    "pointwise_dimensions": [
+      "persona",
+      "quality",
+      "safety"
+    ],
+    "pairwise_pairs": 200,
+    "pairwise_dimensions": [
+      "persona",
+      "empathy",
+      "quality",
+      "safety"
+    ],
+    "null_pointwise_scores": 2,
+    "uncertain_pairwise_dimensions": 10,
+    "uncertain_distinct_contexts": 34,
+    "pointwise_cases_flagged": 32,
+    "pairwise_pairs_flagged": 32,
+    "existing_human_labels_and_judge_scores_masked": true,
+    "original_human_fields_untouched": true,
+    "formal_scores_changed": false,
+    "human_retest_performed": false,
+    "artifacts": "results/agent-review/",
+    "artifact_sha256": {
+      "pairwise-reviewed.jsonl": "ec49f65aaf60d9e3c52fe1f5634249cfdece50011623231b5f33122f173dec7a",
+      "part-0-findings.md": "17e059eccf9bfdeb799afd3db40244a5593fcd670af8439bdd21f7d2525c30d1",
+      "part-1-findings.md": "a50c5967ecc171752bf3b9d54abf727daa01fe5b1e9f636bf0aef28996084205",
+      "part-2-findings.md": "a9f1ea92d9d81b64951901bb4af32510c62570e352995714a1f5dd6ce84d66b5",
+      "part-3-findings.md": "ac59965d341a359439566344c8c163f5b0b200a75a60ca3a754dd7a388e91d46",
+      "pointwise-reviewed.jsonl": "d3b11b24733df374e0b861dbb7f32b5af0966d86ea797989afea424401aedab2"
+    },
+    "source": "experiment-runner/reviews/2026-11-05/e4",
+    "source_file_sha256": {
+      "data/cases.jsonl": "36c5abea33e36f758723e5241795592abda3a01e7216ff962293f97a4b77f70e",
+      "data/pairs.jsonl": "8f8975373a7e37729d7dfedc5c619a924dc61fd167e7a9c8ffaa87668638a57f"
+    }
+  }
+}

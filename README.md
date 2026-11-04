@@ -2,7 +2,7 @@
 
 三类 judge 与 CharacterEval 已公开共情评分的一致性有限；本次结果不足以支持用模型评分替代人工标注。
 
-3,000 次原定请求已全部执行，2,970 条严格格式有效，加 1 条明确尾逗号恢复，共 2,971 条可分析；29 条格式失败保留缺失。自动阶段完成，状态为 `awaiting_human`，不再调用模型填补失败。Qwen 已退出，A100 于 23:29 交给 E2。完整记录见 `HANDOFF.md` 和 `docs/formal-progress.json`。
+3,000 次原定请求已全部执行，2,970 条严格格式有效，加 1 条明确尾逗号恢复，共 2,971 条可分析；29 条格式失败保留缺失。按 2026-11-05 用户指定的“实验 + agent 审核”范围，状态为 `complete`。不再调用模型填补失败；新增真人标注和 48 小时重标为 `not_requested`。Qwen 已退出，A100 已于 11 月 4 日 23:29 交给 E2。完整记录见 `HANDOFF.md` 和 [审核来源](docs/agent-review.md)；`docs/formal-progress.json` 为当时执行快照。
 
 | Judge | 写法 | 有效 N | 共情 QWK [95% CI] | Spearman [95% CI] |
 |---|---|---:|---:|---:|
@@ -18,7 +18,8 @@
 
 - 九组 QWK 点估计为 **0.097–0.250**，置信区间大量重叠，不据此宣称某个 judge 优于其他模型。
 - 按固定开发集选择 **qwen / anchored**；公平比较使用全部写法共同有效的 **193** 条样本。独立测试 n=157，QWK **0.125 [-0.016, 0.253]**，区间包含零。该提示只作为开发集选出的候选保存，不宣称已验证为可靠 judge。
-- 原始共情标注覆盖 **200** 条；其余 **3** 个自定义维度、两两偏好及 **50** 条隔日重标仍需真实人工完成。
+- 原始共情真人标注覆盖 **200** 条并原样保留。独立 agent 审核覆盖 **200** 条 persona/quality/safety 和 **200** 对四维偏好；2 个评分为空、10 个偏好维度不确定，合计涉及 34 个需保留上下文或角色不确定性的场景。agent 审核不进入现有 QWK、人类偏好准确率或重标可靠性。
+- `agent_review_complete=true`，`human_validation_complete=false`，`human_validation_required=false`；新增真人标注和 50 条 48 小时重标均为 `not_requested`。缺失真人标签保持为空，相应统计保持不可计算。
 
 开发/测试按对话前缀连通组划分为 39/161 条；不能把同一对话的不同角色或不同轮次分到两边。193 条共同有效样本中实际开发/测试为 36/157。划分修正、原始格式有效率、重试与尾逗号恢复均在报告中披露；没有按结果重新调提示或修改人工原分。
 
@@ -46,11 +47,9 @@ Python 3.11+ suffices; the API and analysis paths have no third-party dependenci
 ```bash
 python3 scripts/run.py prepare --fetch
 python3 scripts/run.py requests
-python3 scripts/run.py annotations
-python3 scripts/run.py annotations --round retest --output data/retest-template.jsonl
 ```
 
-The source is pinned and downloaded under ignored `data/raw/`; source hashes are in `docs/data-source-manifest.json`. Re-running preparation is deterministic. The generated primary cases, alternatives, pairs, prompts and annotation templates remain outside Git. See `docs/baselines.md` for the real source schema and limitations.
+The source is pinned and downloaded under ignored `data/raw/`; source hashes are in `docs/data-source-manifest.json`. Re-running preparation is deterministic. The generated primary cases, alternatives, pairs and prompts remain outside Git. Historical annotation templates are preserved unchanged; creating new human annotations or delayed retests is outside the agreed scope. See `docs/baselines.md` for the real source schema and limitations.
 
 ## Run API judges
 
@@ -81,20 +80,20 @@ python scripts/run.py run --provider qwen --output results/qwen.jsonl
 
 `Qwen/Qwen2.5-7B-Instruct` is pinned to commit `a09a35458c702b33eeacc393d103063234e8bc28`, uses NF4 4-bit loading and BF16 compute on L4/A100. This differs from the original document's MLX quantization backend and is recorded explicitly. It rejects overlength inputs instead of silently truncating; Installed dependency versions were checked on PyPI. Run the full Qwen queue on the allocated GPU and record its actual runtime environment.
 
-## Human labels and report
+## Agent review and report
 
-Fill the blinded `data/human-template.jsonl` using `docs/rubric.md`; the four custom dimensions must be complete. Do not ask a model to supply human labels. Same-context pair preferences and delayed human retest remain separate genuine human work. Validate completed files before use:
+The user chose agent review on 2026-11-05 and explicitly excluded new human annotation and delayed human retest. The completed review is archived separately in `results/agent-review/`, with provenance and limitations in [docs/agent-review.md](docs/agent-review.md). `docs/completion-scope.json` records the scope and reviewed input hashes, independently of the frozen model configuration.
 
 ```bash
-python3 scripts/run.py annotations --validate data/human-initial.jsonl
 python3 scripts/run.py report --judgments results/final-delivery/deepseek.jsonl results/final-delivery/gemini.jsonl results/final-delivery/qwen.jsonl
-# Add --human data/human-combined.jsonl only after genuine initial/retest annotation.
 python3 scripts/reconcile_cost.py --results results/final-delivery
 ```
 
-Outputs are `results/formal-summary.json`, `report.md`, `kappa.svg` and `disagreements.jsonl`. QWK and Spearman use exact paired samples with 1,000 conversation-group bootstrap resamples. Position bias uses both pair orientations. Length partial Spearman stays unavailable until independent human quality scores exist. Unknown/undefined values are `null` rather than fabricated zeros. Pairwise preference agreement is separate from ordinal QWK.
+Do not pass agent review files through `--human`. Existing released CharacterEval Empathy scores remain unchanged; all other human fields stay empty. The archived agent review is not used as human gold or added to the existing formal scores. Missing reference context, role/version and timepoint information remains uncertainty, not a completed human adjudication.
 
-The report records the actual completed-request count. Automated completion still leaves `human_pending`; it does not certify the whole experiment complete. Costs and token accounting are described in `docs/cost.md`.
+Outputs are `results/formal-summary.json`, `report.md`, `kappa.svg` and `disagreements.jsonl`. QWK and Spearman use exact paired samples with 1,000 conversation-group bootstrap resamples. Position bias uses both pair orientations. Length adjustment, human pairwise accuracy and delayed human retest reliability remain unavailable without independent human labels; this absence does not block completion in the agreed scope. Unknown/undefined values remain `null`.
+
+The report preserves 3,000 terminal original requests, 2,971 analyzable outputs and 29 format-invalid outputs. It records `status=complete`, `agent_review_complete=true`, `human_validation_complete=false` and `human_validation_required=false` for these reviewed inputs. Rebuilding the same report retains this scope without model calls or new human work. Costs and token accounting are described in `docs/cost.md`.
 
 ## Sources
 

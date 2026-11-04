@@ -38,19 +38,6 @@
   "failed_request_configs": 51,
   "automated_status": "complete",
   "completion_basis": "Every scheduled request has a terminal outcome; invalid model responses remain measured format failures, not fabricated scores.",
-  "human_pending": {
-    "persona": 200,
-    "empathy": 0,
-    "quality": 200,
-    "safety": 200
-  },
-  "pairwise_human_pending": {
-    "persona": 200,
-    "empathy": 200,
-    "quality": 200,
-    "safety": 200
-  },
-  "retest_pending": 50,
   "pointwise": [
     {
       "provider": "deepseek",
@@ -78,7 +65,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "deepseek",
@@ -144,7 +131,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "deepseek",
@@ -172,7 +159,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "deepseek",
@@ -200,7 +187,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "deepseek",
@@ -266,7 +253,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "deepseek",
@@ -294,7 +281,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "deepseek",
@@ -322,7 +309,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "deepseek",
@@ -388,7 +375,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "deepseek",
@@ -416,7 +403,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -444,7 +431,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -510,7 +497,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -538,7 +525,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -566,7 +553,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -632,7 +619,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -660,7 +647,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -688,7 +675,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -754,7 +741,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "gemini",
@@ -782,7 +769,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -810,7 +797,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -876,7 +863,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -904,7 +891,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -932,7 +919,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -998,7 +985,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -1026,7 +1013,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -1054,7 +1041,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -1120,7 +1107,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     },
     {
       "provider": "qwen",
@@ -1148,7 +1135,7 @@
         "valid_resamples": 0
       },
       "length_definition": "Unicode character count; control = independently human-rated quality",
-      "status": "human_or_judgment_pending"
+      "status": "not_measured_missing_human_or_judge_records"
     }
   ],
   "pairwise": [
@@ -1641,7 +1628,8 @@
     "ambiguous_inflight_attempts": 1
   },
   "limitations": [
-    "Empathy-only source population; other custom dimensions require new human annotation.",
+    "Empathy-only source population; other custom dimensions have agent review only, so independent human agreement estimates remain unavailable.",
+    "Agent review has unresolved reference-context, role/version and timepoint uncertainty; its ratings are separate from human gold.",
     "Frozen custom empathy anchors differ from the upstream annotation examples; disagreement does not establish which judgment is correct.",
     "Released reward-model training data are public and potentially contaminated.",
     "Published candidate alternatives include Qwen/Baichuan; Qwen judge self-preference is a possible confound.",
@@ -2191,5 +2179,64 @@
     },
     "scope": "Exploratory Empathy prompt choice on cases valid under every judge/style. Format failures may make this subset unrepresentative; no universal or causal superiority claim."
   },
-  "status": "awaiting_human"
+  "status": "complete",
+  "human_labels_missing": {
+    "persona": 200,
+    "empathy": 0,
+    "quality": 200,
+    "safety": 200
+  },
+  "pairwise_human_labels_missing": {
+    "persona": 200,
+    "empathy": 200,
+    "quality": 200,
+    "safety": 200
+  },
+  "human_retest_missing": 50,
+  "completion_scope": "automated_experiment_with_agent_review",
+  "scope_decision_date": "2026-11-05",
+  "agent_review_complete": true,
+  "human_validation_complete": false,
+  "human_validation_required": false,
+  "human_annotation_status": "not_requested",
+  "delayed_human_retest_status": "not_requested",
+  "agent_review": {
+    "reviewer_type": "agent",
+    "pointwise_cases": 200,
+    "pointwise_dimensions": [
+      "persona",
+      "quality",
+      "safety"
+    ],
+    "pairwise_pairs": 200,
+    "pairwise_dimensions": [
+      "persona",
+      "empathy",
+      "quality",
+      "safety"
+    ],
+    "null_pointwise_scores": 2,
+    "uncertain_pairwise_dimensions": 10,
+    "uncertain_distinct_contexts": 34,
+    "pointwise_cases_flagged": 32,
+    "pairwise_pairs_flagged": 32,
+    "existing_human_labels_and_judge_scores_masked": true,
+    "original_human_fields_untouched": true,
+    "formal_scores_changed": false,
+    "human_retest_performed": false,
+    "artifacts": "results/agent-review/",
+    "artifact_sha256": {
+      "pairwise-reviewed.jsonl": "ec49f65aaf60d9e3c52fe1f5634249cfdece50011623231b5f33122f173dec7a",
+      "part-0-findings.md": "17e059eccf9bfdeb799afd3db40244a5593fcd670af8439bdd21f7d2525c30d1",
+      "part-1-findings.md": "a50c5967ecc171752bf3b9d54abf727daa01fe5b1e9f636bf0aef28996084205",
+      "part-2-findings.md": "a9f1ea92d9d81b64951901bb4af32510c62570e352995714a1f5dd6ce84d66b5",
+      "part-3-findings.md": "ac59965d341a359439566344c8c163f5b0b200a75a60ca3a754dd7a388e91d46",
+      "pointwise-reviewed.jsonl": "d3b11b24733df374e0b861dbb7f32b5af0966d86ea797989afea424401aedab2"
+    },
+    "source": "experiment-runner/reviews/2026-11-05/e4",
+    "source_file_sha256": {
+      "data/cases.jsonl": "36c5abea33e36f758723e5241795592abda3a01e7216ff962293f97a4b77f70e",
+      "data/pairs.jsonl": "8f8975373a7e37729d7dfedc5c619a924dc61fd167e7a9c8ffaa87668638a57f"
+    }
+  }
 }

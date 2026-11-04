@@ -1,6 +1,6 @@
 # E4 formal execution handoff
 
-Snapshot: **2026-11-04 14:29:05 UTC / 23:29:05 JST**. All **3,000 original requests have terminal outcomes**. There are **2,970 strict-valid outputs plus one separately marked trailing-comma recovery: 2,971 analyzable outputs and 29 remaining format-invalid outputs**. E4 is **`awaiting_human`**. Qwen's final artifacts have been collected, its foreground task has returned, and E2 was explicitly notified to take the GPU at 23:29:05 JST. The final analysis and standalone figures are generated; the PNG has been visually inspected. Server pi remains paused until coordinator handoff.
+Scope updated **2026-11-05 JST**; execution snapshot **2026-11-04 14:29:05 UTC / 23:29:05 JST**. All **3,000 original requests have terminal outcomes**. There are **2,970 strict-valid outputs plus one separately marked trailing-comma recovery: 2,971 analyzable outputs and 29 remaining format-invalid outputs**. E4 is **`complete`** under the user-selected automated experiment plus agent-review scope. `agent_review_complete=true`, `human_validation_complete=false`, `human_validation_required=false`; new human annotation and 48-hour retest are `not_requested`. Qwen's final artifacts have been collected, its foreground task has returned, and E2 was explicitly notified to take the GPU at 23:29:05 JST. The final analysis and standalone figures are generated; the PNG has been visually inspected. This completed E4 task needs no worker restart; other experiments and the shared GPU remain under the coordinator’s control.
 
 ## Completed API work
 
@@ -63,7 +63,7 @@ python3 scripts/write_case_report.py
 .venv/bin/python -m pip freeze > results/plots-env.txt
 ```
 
-Report artifacts remain `results/formal-summary.json`, `results/report.md`, and `results/selected-prompt.json`; case explanations are `docs/disagreement-analysis.md`. Figure exports are `figures/formal-comparison.png`, `.svg`, and `.pdf`. The report uses exact valid-sample denominators and discloses the failed-format count. Automatic execution is complete; no additional judging or verification gate is needed. The human work below remains pending.
+Report artifacts remain `results/formal-summary.json`, `results/report.md`, and `results/selected-prompt.json`; case explanations are `docs/disagreement-analysis.md`. Figure exports are `figures/formal-comparison.png`, `.svg`, and `.pdf`. The report uses exact valid-sample denominators and discloses the failed-format count. Automatic execution and the separate agent review are complete. No further E4 model calls, new human annotation or delayed human retest are requested. Execution receipts retain their historical state labels; current completion metadata is `docs/completion-scope.json` and `results/formal-summary.json`.
 
 ## Result and human-data boundary
 
@@ -71,4 +71,8 @@ All 1,800 pointwise requests have already executed. DeepSeek and Gemini each hav
 
 The development rule selected **Qwen / anchored**. Held-out Empathy QWK is **0.12509, 95% CI [-0.01607, 0.25335]**; Spearman is **0.11008, 95% CI [-0.04037, 0.24729]**. Both intervals include zero. These results do not establish a reliable replacement for human scoring. Do not switch the selected prompt based on the held-out result. The 20 disagreement explanations are Codex-authored analytic hypotheses, not new human labels or adjudication.
 
-The 200 cases have actual released CharacterEval Empathy scores. Still pending are **200 × 3 custom persona/quality/safety scores, 200 × 4 same-context pair preferences, and 50 delayed human relabels at least 48 hours later**. Length-bias adjustment that requires independent human quality scores remains unavailable. Never label model-generated ratings as human work. Public-source contamination, rubric differences and format-related missingness remain limitations even when automatic execution finishes.
+The 200 cases retain their actual released CharacterEval Empathy scores. Per the 2026-11-05 user instruction, new **200 × 3 custom human scores, 200 × 4 human pair preferences, and 50 delayed human relabels at least 48 hours later** are **not_requested**. Their absence remains visible in `human_labels_missing`, `pairwise_human_labels_missing` and `human_retest_missing`; the original empty human fields are unchanged.
+
+Separate agent review covers all 200 pointwise cases and 200 pairs. Two custom scores remain null and ten preference dimensions remain uncertain; 34 distinct contexts have unresolved reference-context or role/version/timepoint uncertainty. These are disclosed analytic limitations, not tasks requiring the user to annotate. The complete review artifacts, hashes and four reviewers’ findings are in `results/agent-review/` and `docs/completion-scope.json`; see `docs/agent-review.md` for provenance.
+
+Agent ratings never enter the existing human gold, QWK, human preference accuracy, length adjustment or retest reliability. Those unavailable human-dependent measures remain null. Public-source contamination, rubric differences and format-related missingness also remain limitations. Existing formal scores and costs are unchanged. The next E4 action is optional report reproduction using the command above; no GPU submission or human work remains in the agreed scope.

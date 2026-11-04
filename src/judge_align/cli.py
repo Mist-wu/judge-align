@@ -90,7 +90,7 @@ def main(argv=None):
             if args.fetch:fetch(args.raw_dir)
             cases,pairs=prepare(args.raw_dir,args.count,args.seed)
             write_jsonl(args.cases,cases);write_jsonl(args.pairs,pairs)
-            print(json.dumps({'primary_count':sum(c['primary'] for c in cases),'total_cases':len(cases),'pairs':len(pairs),'human_pending':['persona','quality','safety','pairwise preference','delayed retest']}))
+            print(json.dumps({'primary_count':sum(c['primary'] for c in cases),'total_cases':len(cases),'pairs':len(pairs),'human_measurements_absent':['persona','quality','safety','pairwise preference','delayed retest']}))
         elif args.command=='requests':
             cfg=json.loads(Path(args.config).read_text());rows=list(make_requests(read_jsonl(args.cases),read_jsonl(args.pairs),cfg['providers']))
             if not rows:raise ValueError('No input cases; run prepare first')
@@ -116,7 +116,7 @@ def main(argv=None):
             cfg=json.loads(Path(args.config).read_text())
             rows=[r for path in args.judgments for r in read_jsonl(path)]
             report=build_report(read_jsonl(args.cases),read_jsonl(args.pairs),rows,read_jsonl(args.human) if args.human else [],cfg,args.outdir)
-            print(json.dumps({k:report[k] for k in ['automated_status','primary_count','pair_count','successful_requests','expected_requests','human_pending']}))
+            print(json.dumps({k:report[k] for k in ['status','automated_status','agent_review_complete','human_validation_required','primary_count','pair_count','successful_requests','expected_requests','human_labels_missing']}))
         return 0
     except (ValueError,ProviderError,FileNotFoundError,KeyError) as exc:
         print(f'{type(exc).__name__}: {exc}',file=sys.stderr)

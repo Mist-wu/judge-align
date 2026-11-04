@@ -10,6 +10,35 @@ from .selection import select_on_development,conversation_groups
 from .prompts import prompt_for
 
 
+def apply_completion_scope(report,pairs):
+    """Apply the recorded user scope without importing agent ratings as human gold."""
+    scope=json.loads((Path(__file__).resolve().parents[2]/'docs/completion-scope.json').read_text())
+    reviewed=report['data_sha256']==scope['data_sha256'] and digest(pairs)==scope['pairs_sha256']
+    report.update({
+        'completion_scope':scope['completion_scope'],
+        'scope_decision_date':scope['decision_date'],
+        'agent_review_complete':reviewed,
+        'human_validation_complete':False,
+        'human_validation_required':scope['human_validation_required'],
+        'human_annotation_status':scope['human_annotation_status'],
+        'delayed_human_retest_status':scope['delayed_human_retest_status'],
+        'agent_review':scope['agent_review'],
+        'status':report['automated_status'] if reviewed else 'agent_review_required',
+    })
+    return report
+
+
+def review_scope_lines(report):
+    review=report['agent_review']
+    return ['## Review scope and missing human measurements','',
+        f"Agent review complete: **{report['agent_review_complete']}**. New human annotation and delayed human retest: **not_requested** per the 2026-11-05 user instruction.",'',
+        f"Separate agent review covers {review['pointwise_cases']} pointwise cases (persona/quality/safety) and {review['pairwise_pairs']} pairs (four dimensions). {review['null_pointwise_scores']} pointwise scores remain null; {review['uncertain_pairwise_dimensions']} pairwise dimensions remain uncertain across {review['uncertain_distinct_contexts']} flagged contexts. These uncertainties remain disclosed, not required human tasks.",'',
+        'Reviewers lacked some reference context and role/version/timepoint information. Agent ratings are not human gold and do not enter QWK, pairwise human accuracy, length adjustment or human retest reliability. Existing released CharacterEval Empathy labels remain the only human reference used here. See [review provenance](../docs/agent-review.md).','',
+        'Missing custom human scores (data absence, not pending work): '+json.dumps(report['human_labels_missing'],ensure_ascii=False),
+        'Missing human pair preferences: '+json.dumps(report['pairwise_human_labels_missing'],ensure_ascii=False),
+        f"Unperformed human delayed retests: {max(0,report['human_retest_missing'])}. Human validation complete: **false**; required in the agreed scope: **false**."]
+
+
 def heatmap_svg(pointwise,path):
     providers=sorted({r["provider"] for r in pointwise})
     columns=[(style,d) for style in ["direct","rationale","anchored"] for d in DIMENSIONS]
@@ -92,7 +121,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                 length=cluster_ci(quality_matched,lambda r:partial_spearman([x['judge'] for x in r],[x['length'] for x in r],[x['quality'] for x in r]),rounds=rounds,seed=seed)
                 pointwise.append({'provider':provider,'style':style,'dimension':dimension,'qwk':q,'spearman':s,
                                   'length_partial_spearman':length,'length_definition':'Unicode character count; control = independently human-rated quality',
-                                  'status':'measured' if matched else 'human_or_judgment_pending'})
+                                  'status':'measured' if matched else 'not_measured_missing_human_or_judge_records'})
         for dimension in DIMENSIONS:
             complete=[]
             for pair in pairs:
@@ -140,8 +169,8 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         'failed_request_configs':len(failed),
         'automated_status':'complete' if len(attempted)==expected and len(primary)==config['sample_count'] and len(pairs)==config['sample_count'] else 'partial',
         'completion_basis':'Every scheduled request has a terminal outcome; invalid model responses remain measured format failures, not fabricated scores.',
-        'human_pending':pending,'pairwise_human_pending':{d:sum(d not in pair_references[p['id']] for p in pairs) for d in DIMENSIONS},
-        'retest_pending':50-sum('initial' in r and 'retest' in r for r in retest.values()),
+        'human_labels_missing':pending,'pairwise_human_labels_missing':{d:sum(d not in pair_references[p['id']] for p in pairs) for d in DIMENSIONS},
+        'human_retest_missing':50-sum('initial' in r and 'retest' in r for r in retest.values()),
         'pointwise':pointwise,'pairwise':pairwise,'human_reliability':reliability,
         'config_sha256':digest(config),'data_sha256':digest(cases),'judgments_sha256':digest(judgments),
         'observed_provider_config_hashes':{k:sorted(v) for k,v in provider_configs.items()},
@@ -150,7 +179,8 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         'cost':{'known_estimated_usd':sum(r.get('estimated_cost_usd') or 0 for r in judgments if r.get('status') in {'success','failed'}),
                 'unknown_pricing_terminal_attempts':sum(r.get('estimated_cost_usd') is None for r in judgments if r.get('status') in {'success','failed'} and r.get('record_type')!='format_recovery'),
                 'ambiguous_inflight_attempts':sum(status=='started' for status in {r.get('run_key'):r.get('status') for r in judgments}.values())},
-        'limitations':['Empathy-only source population; other custom dimensions require new human annotation.',
+        'limitations':['Empathy-only source population; other custom dimensions have agent review only, so independent human agreement estimates remain unavailable.',
+                       'Agent review has unresolved reference-context, role/version and timepoint uncertainty; its ratings are separate from human gold.',
                        'Frozen custom empathy anchors differ from the upstream annotation examples; disagreement does not establish which judgment is correct.',
                        'Released reward-model training data are public and potentially contaminated.',
                        'Published candidate alternatives include Qwen/Baichuan; Qwen judge self-preference is a possible confound.',
@@ -159,7 +189,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                        'Invalid JSON outputs are excluded from agreement metrics; format-related missingness may bias valid-sample estimates.',
                        'Human retest reliability is not a mathematical upper bound on judge agreement.']}
     report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds,attempted)
-    report['status']='awaiting_human' if report['automated_status']=='complete' and (any(pending.values()) or report['retest_pending']>0 or any(report['pairwise_human_pending'].values())) else report['automated_status']
+    apply_completion_scope(report,pairs)
     structured_retries=sum(row.get('status')=='success' and row.get('provider_metadata',{}).get('structured_output',False) for row in judgments)
     if structured_retries:
         report['execution_changes'].append(f'{structured_retries} Gemini pairwise requests completed with an explicit JSON Schema after malformed JSON replies; prompts, candidate order and winner categories were unchanged.')
@@ -179,11 +209,11 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         {'case_id':cid,'role':index[cid]['role'],'context':index[cid]['context'],
          'response':index[cid]['response'],'source_rows':index[cid]['source_rows'],
          'human_scores':references[cid],'judgments':by_case[cid],
-         'review_status':'awaiting_qualitative_analysis_not_new_human_annotation'} for cid in worst])
+         'review_status':'agent_review_complete' if report['agent_review_complete'] else 'agent_review_required'} for cid in worst])
     heatmap_svg(pointwise,out/'kappa.svg')
     bias_svg([(r['provider']+'/'+r['dimension'],r['position_inconsistency']) for r in pairwise],out/'position-bias.svg','Canonical outcome inconsistency after swapping A/B; 95% cluster bootstrap CI')
     bias_svg([(r['provider']+'/'+r['style']+'/'+r['dimension'],r['length_partial_spearman']) for r in pointwise],out/'length-bias.svg','Length association after control for independent human quality; not causal')
-    lines=['# Judge alignment report','',f"Automated status: **{report['automated_status']}**; {len(attempted)}/{expected} requests executed; {len(successful)} analyzable outputs.",'',
+    lines=['# Judge alignment report','',f"Status: **{report['status']}** under the agreed automated experiment plus agent-review scope.",'',f"Automated status: **{report['automated_status']}**; {len(attempted)}/{expected} requests executed; {len(successful)} analyzable outputs.",'',
            f"Standard JSON parser successes: {report['strict_json_successful_requests']}; transparent syntax-only recoveries: {report['format_recovered_requests']}. Original failed attempts remain in the ledger.",'',
            'All statistics use matched human/judge records; missing labels remain missing.','',
            '| Provider | Style | Dimension | N | QWK [95% CI] | Spearman [95% CI] |','|---|---|---|---:|---:|---:|']
@@ -219,8 +249,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     for provider,stats in format_outcomes.items():
         lines.append(f"| {provider} | {stats['first_attempt_successes']} | {stats['first_attempt_failures']} | {stats['retry_attempts']} | {stats['format_recoveries']} |")
     lines+=['','## Execution changes','']+[f'- {s}' for s in report['execution_changes']]
-    lines+=['','![QWK](kappa.svg)','','![Position bias](position-bias.svg)','','![Length bias](length-bias.svg)','','## Human work remaining','',json.dumps(pending,ensure_ascii=False),
-            '',f"Delayed retest remaining: {max(0,report['retest_pending'])}",'','## Limitations','']+[f'- {s}' for s in report['limitations']]
+    lines+=['','![QWK](kappa.svg)','','![Position bias](position-bias.svg)','','![Length bias](length-bias.svg)','']+review_scope_lines(report)+['','## Limitations','']+[f'- {s}' for s in report['limitations']]
     (out/'report.md').write_text('\n'.join(lines)+'\n')
     return report
 

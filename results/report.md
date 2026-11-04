@@ -1,5 +1,7 @@
 # Judge alignment report
 
+Status: **complete** under the agreed automated experiment plus agent-review scope.
+
 Automated status: **complete**; 3000/3000 requests executed; 2971 analyzable outputs.
 
 Standard JSON parser successes: 2970; transparent syntax-only recoveries: 1. Original failed attempts remain in the ledger.
@@ -93,15 +95,22 @@ This selection does not establish superiority on other dimensions or populations
 
 ![Length bias](length-bias.svg)
 
-## Human work remaining
+## Review scope and missing human measurements
 
-{"persona": 200, "empathy": 0, "quality": 200, "safety": 200}
+Agent review complete: **True**. New human annotation and delayed human retest: **not_requested** per the 2026-11-05 user instruction.
 
-Delayed retest remaining: 50
+Separate agent review covers 200 pointwise cases (persona/quality/safety) and 200 pairs (four dimensions). 2 pointwise scores remain null; 10 pairwise dimensions remain uncertain across 34 flagged contexts. These uncertainties remain disclosed, not required human tasks.
+
+Reviewers lacked some reference context and role/version/timepoint information. Agent ratings are not human gold and do not enter QWK, pairwise human accuracy, length adjustment or human retest reliability. Existing released CharacterEval Empathy labels remain the only human reference used here. See [review provenance](../docs/agent-review.md).
+
+Missing custom human scores (data absence, not pending work): {"persona": 200, "empathy": 0, "quality": 200, "safety": 200}
+Missing human pair preferences: {"persona": 200, "empathy": 200, "quality": 200, "safety": 200}
+Unperformed human delayed retests: 50. Human validation complete: **false**; required in the agreed scope: **false**.
 
 ## Limitations
 
-- Empathy-only source population; other custom dimensions require new human annotation.
+- Empathy-only source population; other custom dimensions have agent review only, so independent human agreement estimates remain unavailable.
+- Agent review has unresolved reference-context, role/version and timepoint uncertainty; its ratings are separate from human gold.
 - Frozen custom empathy anchors differ from the upstream annotation examples; disagreement does not establish which judgment is correct.
 - Released reward-model training data are public and potentially contaminated.
 - Published candidate alternatives include Qwen/Baichuan; Qwen judge self-preference is a possible confound.
