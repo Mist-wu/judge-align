@@ -163,6 +163,10 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         report['execution_changes'].append(f'{structured_retries} Gemini pairwise requests completed with an explicit JSON Schema after malformed JSON replies; prompts, candidate order and winner categories were unchanged.')
     if report['format_recovered_requests']:
         report['execution_changes'].append(f"{report['format_recovered_requests']} Qwen outputs recovered by removing only trailing commas outside JSON strings. Original parse failures and billed usage remain recorded; no model was called and no score changed.")
+    batched_qwen=[row for row in judgments if row.get('provider')=='qwen' and row.get('status') in {'success','failed'}
+                  and row.get('record_type')!='format_recovery' and row.get('provider_metadata',{}).get('batch_size',1)>1]
+    if batched_qwen:
+        report['execution_changes'].append(f"Qwen resumed {len(batched_qwen)} original requests in batches of at most 16 after the original Colab allocation disappeared. The first 641 terminal outcomes (including 9 format failures) were retained. Model revision, NF4 precision, prompts, greedy decoding and 1536-token output capacity were unchanged; left padding and per-row EOS accounting were added for batching. One prior in-flight request had no durable terminal outcome and was explicitly resumed; its lost token usage is unknown.")
     atomic_json(out/'split-manifest.json',report['prompt_selection']['manifest'])
     atomic_json(out/'formal-summary.json',report)
     by_case=defaultdict(list)
@@ -212,6 +216,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
               '|---|---:|---:|---:|---:|']
     for provider,stats in format_outcomes.items():
         lines.append(f"| {provider} | {stats['first_attempt_successes']} | {stats['first_attempt_failures']} | {stats['retry_attempts']} | {stats['format_recoveries']} |")
+    lines+=['','## Execution changes','']+[f'- {s}' for s in report['execution_changes']]
     lines+=['','![QWK](kappa.svg)','','![Position bias](position-bias.svg)','','![Length bias](length-bias.svg)','','## Human work remaining','',json.dumps(pending,ensure_ascii=False),
             '',f"Delayed retest remaining: {max(0,report['retest_pending'])}",'','## Limitations','']+[f'- {s}' for s in report['limitations']]
     (out/'report.md').write_text('\n'.join(lines)+'\n')
