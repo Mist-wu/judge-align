@@ -1,0 +1,17 @@
+{
+  "run_id": "E4-qwen-formal-002",
+  "session": "exp-e4-qwen",
+  "started_at": "2026-11-04T12:29:27.274299+00:00",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+  "target_requests": 1000,
+  "state": "running",
+  "commit": "e2c578f1d488e531bc4d0c80d3c1e56385f124e6",
+  "hardware": {
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "gpu_memory_bytes": 42405855232,
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "quantization": "bitsandbytes NF4 4-bit"
+  }
+}
