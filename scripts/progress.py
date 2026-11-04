@@ -28,10 +28,10 @@ snapshot = {'snapshot_at':datetime.now(timezone.utc).isoformat(), 'status':'prog
             'logs':[str(root/'logs/formal-api.log'),str(root/'logs/formal-deepseek.log')],
             'refresh_command':'python3 scripts/progress.py',
             'report_command':'python3 scripts/run.py report --judgments results/deepseek.jsonl results/gemini.jsonl results/qwen.jsonl',
-            'qwen_status':'A100 formal run E4-qwen-formal-001 submitted; poll transport receipt for current state',
+            'qwen_status':'A100 continuation E4-qwen-formal-002 submitted after 001 failed before scoring; poll transport receipt for current state',
             'qwen_session':'exp-e4-qwen',
-            'qwen_transport_receipt':'/srv/exp-runner/state/remote/E4-qwen-formal-001',
-            'qwen_drive_checkpoint':'gdrive:exp/runs/E4/E4-qwen-formal-001',
+            'qwen_transport_receipt':'/srv/exp-runner/state/remote/E4-qwen-formal-002',
+            'qwen_drive_checkpoint':'gdrive:exp/runs/E4/E4-qwen-formal-002',
             'note':'exp-e4-apis may eventually exit failed because its original DeepSeek child failed; independent resumed DeepSeek is exp-e4-deepseek.'}
 (root/'docs/formal-progress.json').write_text(json.dumps(snapshot,indent=2)+'\n')
 print(json.dumps(snapshot,ensure_ascii=False))
