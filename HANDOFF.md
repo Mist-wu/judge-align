@@ -1,6 +1,6 @@
 # E4 formal execution handoff
 
-Snapshot: **2026-11-04 14:16:39 UTC / 23:16:39 JST**. The Mac E4 agent controls this experiment; server pi is paused. Both API queues have ended. Qwen recovery `E4-qwen-formal-003` has started on the replacement A100; dependency installation is complete and model loading has been observed. First-batch throughput and final completion have not yet been observed at this snapshot.
+Snapshot: **2026-11-04 14:29:05 UTC / 23:29:05 JST**. All **3,000 original requests have terminal outcomes**. There are **2,970 strict-valid outputs plus one separately marked trailing-comma recovery: 2,971 analyzable outputs and 29 remaining format-invalid outputs**. E4 is **`awaiting_human`**. Qwen's final artifacts have been collected, its foreground task has returned, and E2 was explicitly notified to take the GPU at 23:29:05 JST. The Mac E4 agent is generating the final analysis; server pi remains paused.
 
 ## Completed API work
 
@@ -11,28 +11,28 @@ Each provider executed all **1,000 original requests**: 600 pointwise requests a
 | `deepseek-flash` | 1,000 | 0 | 1,005 | 5 |
 | `gemini-3.8-flash` | 991 | 9 | 1,016 | 25 |
 
-The two AWS units, `exp-e4-apis.service` and `exp-e4-deepseek.service`, have no worker PID and ended in failed state because recorded failures propagate their actual exit status. They are not active workers to restart. Do not issue additional API requests merely to replace format-invalid outputs. Keep local merged `results/deepseek.jsonl` and `results/gemini.jsonl`; copying the original server ledgers over them would discard collected retries. Original exports remain under `results/original-api/`; `results/api-merge-receipt.json` records the merge and hashes. The known API list-price estimate is **$3.57763116**, plus one DeepSeek attempt with unknown usage; see `docs/cost.md`.
+The two AWS units, `exp-e4-apis.service` and `exp-e4-deepseek.service`, have no worker PID and ended in failed state because recorded failures propagate their actual exit status. They are not active workers to restart. Do not issue additional API requests merely to replace format-invalid outputs. The canonical merged delivery ledgers are `results/final-delivery/deepseek.jsonl` and `results/final-delivery/gemini.jsonl`. They are synchronized through fast-forward-only Git without overwriting the original server `results/deepseek.jsonl` or `results/gemini.jsonl`. Original local exports remain under `results/original-api/`; `results/api-merge-receipt.json` records the merge and hashes. The known API list-price estimate is **$3.57763116**, plus one DeepSeek attempt with unknown usage; see `docs/cost.md`.
 
-## Active Qwen recovery
+## Completed Qwen recovery
 
 - Session: `exp-e24-recovery-a100`; endpoint: `gpu-a100-s-ass1b0-kysuwtw187ve`.
 - Run: `E4-qwen-formal-003`; source commit: `373a1e00e84f46c6dd3f93a6483ca3e93d8939a9`.
 - Model: `Qwen/Qwen2.5-7B-Instruct`, revision `a09a35458c702b33eeacc393d103063234e8bc28`; A100-SXM4-40GB, torch 2.8.0+cu128, NF4 4-bit loading and BF16 compute.
-- Independent environment: `/content/e4-venv`. E2's environment and files are separate; E2 has staged its recovery and is waiting without a GPU model.
+- Independent environment: `/content/e4-venv`. E2's environment and files are separate; E4 has handed model use back to E2.
 - Runtime status: `/content/experiment-runs/E4-qwen-formal-003/status.json`; log: `/content/experiment-runs/E4-qwen-formal-003/output.log`.
 - Runtime artifacts: `/content/experiment-runs/E4-qwen-formal-003/workspace/results/` (`qwen.jsonl`, `qwen-run.json`, `qwen-env.txt`, `qwen-drive-copy.json`).
-- Durable destination: `gdrive:exp/runs/E4/E4-qwen-formal-003`; checkpoints every 120 seconds and at exit.
+- Durable destination: `gdrive:exp/runs/E4/E4-qwen-formal-003`; final copy verified at **14:29:04.981802 UTC**. Local downloaded originals are in `results/recovered-003/`; delivery ledgers and copied run/environment/status/Drive/merge receipts are in `results/final-delivery/`.
 
-The old `exp-e4-qwen` assignment disappeared at approximately 13:49 UTC; it was not stopped by the E4 agent. Its recovered Drive ledger is preserved under local `results/recovered-002/` and AWS `/srv/exp-runner/state/remote/E4-qwen-formal-002-drive-recovery/`. The durable checkpoint has **641 terminal IDs (632 valid, 9 format failures)**. Only the **359 original IDs without a terminal outcome** are in `data/qwen-remaining-003.jsonl`, including one lost in-flight request. Existing successful and terminal format-failed outputs are excluded from regeneration.
+The old `exp-e4-qwen` assignment disappeared at approximately 13:49 UTC; it was not stopped by the E4 agent. Its recovered Drive ledger is preserved under local `results/recovered-002/` and AWS `/srv/exp-runner/state/remote/E4-qwen-formal-002-drive-recovery/`. The durable checkpoint has **641 terminal IDs (632 valid, 9 format failures)**. Only the **359 original IDs without a terminal outcome** were placed in `data/qwen-remaining-003.jsonl`, including one lost in-flight request. Existing successful and terminal format-failed outputs were excluded from regeneration.
 
-The already-submitted foreground launch is below for provenance, **not for duplicate submission**. Keep its real output connection attached until the task ends.
+The completed foreground launch is below for provenance, **not for duplicate submission**. Its real output connection was retained through completion.
 
 ```bash
 colab exec -s exp-e24-recovery-a100 --timeout 86400 \
   -f /Users/wu/Github/judge-align/results/recovery-003-transport/foreground.py
 ```
 
-Its payload runs:
+Its payload ran:
 
 ```bash
 /content/e4-venv/bin/python scripts/run_qwen_formal.py \
@@ -43,24 +43,27 @@ Its payload runs:
 
 Recovery changes batch scheduling to size 16; the fixed model, precision, prompts, greedy decoding and output cap remain unchanged and recorded. It does not establish bit-for-bit equivalence to serial execution. Input uses left padding; token accounting excludes padding and terminates each row at its actual EOS. The first 641 terminal outputs came from serial execution. Preserve this execution change and the interruption in the final report. New malformed output remains a terminal experimental result; a nonzero process exit caused by such failures is not evidence that the original request was never executed.
 
-**When the remaining requests finish, confirm the Qwen model process and foreground task have ended and immediately notify E2 and the coordinator. Do not release or restart this runtime.** E2 then loads its training model in its own environment.
+The 359-request batch phase ran from **14:21:27.315849 to 14:28:53.964177 UTC**, approximately **48.2 requests/minute**. The run receipt ended at **14:28:59.153916 UTC**. All 1,000 Qwen IDs have terminal outcomes: **979 strict-valid and 21 strict-invalid**, with one already-existing trailing-comma recovery giving **980 analyzable and 20 remaining invalid**. The actual remote child exit code is **1**, reflecting retained format failures; the enclosing Colab CLI's exit code 0 must not replace it.
 
-## Collection and final analysis
+**The Qwen model and foreground task have ended; E2 was notified at 23:29:05 JST to load its training model. Do not release or restart this runtime.**
 
-Collect the `003` artifact directory and final status, retaining the original raw ledger and actual process exit code. Confirm that all 1,000 original Qwen IDs have terminal outcomes; successful formatting is a separate rate, not the execution-completion condition. Preserve any obvious syntax recovery as a separately marked derived record with its original failure and raw text. Do not fill missing fields or scores, and do not generate replacement judgments.
+## Collected artifacts and reproduction
 
-After collection and the documented merge, the next analysis commands from `/Users/wu/Github/judge-align` are:
+The `003` artifacts and final status have been downloaded, preserving the raw ledger and actual process exit code. The one unambiguous trailing-comma recovery is a separately marked derived record with its original failure and raw text retained. No missing fields or scores were filled, and terminal formatting failures were not regenerated. `results/final-delivery/` contains the canonical merged delivery ledgers, which keep original model attempts and derived recovery records distinct.
+
+The final report and figures are being generated from these collected outputs. To reproduce the analysis from `/Users/wu/Github/judge-align`:
 
 ```bash
 python3 scripts/run.py report \
-  --judgments results/deepseek.jsonl results/gemini.jsonl results/qwen.jsonl
-python3 scripts/reconcile_cost.py
+  --judgments results/final-delivery/deepseek.jsonl \
+  results/final-delivery/gemini.jsonl results/final-delivery/qwen.jsonl
+python3 scripts/reconcile_cost.py --results results/final-delivery
 python3 scripts/write_case_report.py
 .venv/bin/python scripts/plot_results.py
 .venv/bin/python -m pip freeze > results/plots-env.txt
 ```
 
-The report command above assumes any separately marked, unambiguous format-recovery records have been included once in the merged Qwen ledger. Inspect the rendered `figures/formal-comparison.png` and preserve `.svg`/`.pdf` exports. Deliver `results/formal-summary.json`, `results/report.md`, `results/selected-prompt.json`, final ledgers/receipts, the figures, `docs/disagreement-analysis.md`, and updated README/cost/status documents. No separate smoke-test or verification gate is required. Completion means all **3,000 scheduled requests have terminal outcomes**, with failed-format counts and valid-sample denominators disclosed; the human work below remains pending.
+Report artifacts remain `results/formal-summary.json`, `results/report.md`, and `results/selected-prompt.json`; case explanations are `docs/disagreement-analysis.md`. Figure exports are `figures/formal-comparison.png`, `.svg`, and `.pdf`. The report uses exact valid-sample denominators and discloses the failed-format count. Automatic execution is complete; no additional judging or verification gate is needed. The human work below remains pending.
 
 ## Result and human-data boundary
 
