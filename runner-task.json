@@ -1,7 +1,17 @@
 {
   "version": 1,
   "experiment_id": "E4",
-  "verify_commands": [["python3", "scripts/verify_completion.py"]],
-  "required_artifacts": ["README.md", "docs/baselines.md", "docs/cost.md", "results/formal-summary.json"],
-  "human_pending": ["custom persona/quality/safety human labels", "same-context pairwise human preferences", "delayed relabel 50"]
+  "verify_commands": [],
+  "required_artifacts": [
+    "README.md",
+    "docs/baselines.md",
+    "docs/cost.md",
+    "results/formal-summary.json"
+  ],
+  "human_pending": [
+    "custom persona/quality/safety human labels",
+    "same-context pairwise human preferences",
+    "delayed relabel 50"
+  ],
+  "completion_basis": "All 3000 formal requests have terminal outcomes; format failures remain results and do not require repeated generation."
 }

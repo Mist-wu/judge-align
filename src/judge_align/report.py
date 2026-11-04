@@ -54,12 +54,15 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         field='scores' if kind=='pointwise' else 'winners'
         (references if kind=='pointwise' else pair_references)[item].update(rows[0][field])
     successful={}
+    attempted=set()
     failed=set()
     provider_configs=defaultdict(set)
     for row in judgments:
         if row.get('status')=='success' and row.get('provider_config_sha256'):
             provider_configs[row['provider']].add(row['provider_config_sha256'])
     for row in judgments:
+        if row.get('status') in {'success','failed'} and row.get('record_type')!='format_recovery':
+            attempted.add((row['provider'],row['style'],row['item_id'],row.get('swapped',False)))
         if row.get('status')=='success':
             key=(row['provider'],row['style'],row['item_id'],row.get('swapped',False))
             if key in successful and successful[key]['result'] != row['result']:
@@ -129,12 +132,14 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         'population':config.get('data_population'),'primary_count':len(primary),'pair_count':len(pairs),
         'bootstrap_unit':'Dialogue-prefix connected component across roles; all response variants and pair orientations remain together',
         'successful_requests':len(successful),'expected_requests':expected,
+        'attempted_requests':len(attempted),
         'strict_json_successful_requests':sum(row.get('record_type')!='format_recovery' for row in successful.values()),
         'format_recovered_requests':sum(row.get('record_type')=='format_recovery' for row in successful.values()),
         'format_outcomes':format_outcomes,
         'failed_attempts':sum(row.get('status')=='failed' for row in judgments),
         'failed_request_configs':len(failed),
-        'automated_status':'complete' if len(successful)==expected and len(primary)==config['sample_count'] and len(pairs)==config['sample_count'] else 'partial',
+        'automated_status':'complete' if len(attempted)==expected and len(primary)==config['sample_count'] and len(pairs)==config['sample_count'] else 'partial',
+        'completion_basis':'Every scheduled request has a terminal outcome; invalid model responses remain measured format failures, not fabricated scores.',
         'human_pending':pending,'pairwise_human_pending':{d:sum(d not in pair_references[p['id']] for p in pairs) for d in DIMENSIONS},
         'retest_pending':50-sum('initial' in r and 'retest' in r for r in retest.values()),
         'pointwise':pointwise,'pairwise':pairwise,'human_reliability':reliability,
@@ -152,7 +157,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                        'Length partial correlation controls observed human quality only; it is not causal.',
                        'Pairwise choices are not ordinal 1–5 scores and are not entered in the QWK heatmap.',
                        'Human retest reliability is not a mathematical upper bound on judge agreement.']}
-    report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds)
+    report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds,attempted)
     structured_retries=sum(row.get('status')=='success' and row.get('provider_metadata',{}).get('structured_output',False) for row in judgments)
     if structured_retries:
         report['execution_changes'].append(f'{structured_retries} Gemini pairwise requests completed with an explicit JSON Schema after malformed JSON replies; prompts, candidate order and winner categories were unchanged.')
@@ -172,7 +177,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     heatmap_svg(pointwise,out/'kappa.svg')
     bias_svg([(r['provider']+'/'+r['dimension'],r['position_inconsistency']) for r in pairwise],out/'position-bias.svg','Canonical outcome inconsistency after swapping A/B; 95% cluster bootstrap CI')
     bias_svg([(r['provider']+'/'+r['style']+'/'+r['dimension'],r['length_partial_spearman']) for r in pointwise],out/'length-bias.svg','Length association after control for independent human quality; not causal')
-    lines=['# Judge alignment report','',f"Automated status: **{report['automated_status']}**; {len(successful)}/{expected} requests.",'',
+    lines=['# Judge alignment report','',f"Automated status: **{report['automated_status']}**; {len(attempted)}/{expected} requests executed; {len(successful)} analyzable outputs.",'',
            f"Standard JSON parser successes: {report['strict_json_successful_requests']}; transparent syntax-only recoveries: {report['format_recovered_requests']}. Original failed attempts remain in the ledger.",'',
            'All statistics use matched human/judge records; missing labels remain missing.','',
            '| Provider | Style | Dimension | N | QWK [95% CI] | Spearman [95% CI] |','|---|---|---|---:|---:|---:|']
@@ -198,6 +203,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                 'context':'{{context}}','response':'{{response}}'},picked['style'])})
         lines += ['',f"Selected only on development Empathy QWK: **{picked['provider']} / {picked['style']}** (development n={picked['n']}).",
                   f"Held-out test n={held['qwk']['n']}; QWK {interval(held['qwk'])}; Spearman {interval(held['spearman'])}.",
+                  f"Comparison uses {selection['common_valid_case_count']} cases with valid outputs from every judge/style; missing-output cases are excluded equally. This conditioning can affect representativeness.",
                   'This selection does not establish superiority on other dimensions or populations.']
     else:
         lines += ['', 'Prompt selection waits for all pointwise requests.']

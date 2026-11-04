@@ -22,7 +22,7 @@ def conversation_groups(cases):
     return {case['id']:find(case['context_id']) for case in cases}
 
 
-def select_on_development(cases, successful, providers, references, rounds=1000):
+def select_on_development(cases, successful, providers, references, rounds=1000, attempted=None):
     primary = [case for case in cases if case['primary']]
     groups=conversation_groups(cases)
     contexts = sorted({groups[case['id']] for case in primary},
@@ -54,13 +54,20 @@ def select_on_development(cases, successful, providers, references, rounds=1000)
     expected = len(primary)*len(providers)*len(styles)
     present = sum((provider, style, case['id'], False) in successful
                   for provider in providers for style in styles for case in primary)
-    if present != expected:
-        return {'state': 'waiting_for_all_pointwise_requests', 'completed': present, 'expected': expected,
+    attempted=successful if attempted is None else attempted
+    attempted_count=sum((provider,style,case['id'],False) in attempted
+                        for provider in providers for style in styles for case in primary)
+    if attempted_count != expected:
+        return {'state': 'waiting_for_all_pointwise_attempts', 'completed': present,
+                'attempted':attempted_count,'expected': expected,
                 'manifest': manifest}
+    common={case['id'] for case in primary if all((provider,style,case['id'],False) in successful
+             for provider in providers for style in styles)}
     def matched(provider, style, split):
         return [{'context_id': groups[case['id']], 'human': references[case['id']]['empathy'],
                  'judge': successful[(provider, style, case['id'], False)]['result']['scores']['empathy']}
-                for case in primary if partition[case['id']] == split and 'empathy' in references[case['id']]]
+                for case in primary if case['id'] in common and partition[case['id']] == split
+                and 'empathy' in references[case['id']]]
     def agreement(rows, metric):
         return metric([row['human'] for row in rows], [row['judge'] for row in rows])
     development = []
@@ -73,7 +80,9 @@ def select_on_development(cases, successful, providers, references, rounds=1000)
     chosen = sorted(eligible, key=lambda row: (-row['qwk'], row['provider'], row['style']))[0]
     test_rows = matched(chosen['provider'], chosen['style'], 'test')
     return {'state': 'complete', 'manifest': manifest, 'development': development,
+            'common_valid_case_count':len(common),
+            'excluded_cases_for_incomplete_judgments':sorted(case['id'] for case in primary if case['id'] not in common),
             'selected': chosen, 'held_out_test': {
                 'qwk': cluster_ci(test_rows, lambda rows: agreement(rows, qwk), rounds=rounds, seed=42),
                 'spearman': cluster_ci(test_rows, lambda rows: agreement(rows, spearman), rounds=rounds, seed=42)},
-            'scope': 'Exploratory Empathy prompt choice on this released subset; no universal or causal superiority claim.'}
+            'scope': 'Exploratory Empathy prompt choice on cases valid under every judge/style. Format failures may make this subset unrepresentative; no universal or causal superiority claim.'}
