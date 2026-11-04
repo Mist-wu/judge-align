@@ -159,6 +159,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                        'Invalid JSON outputs are excluded from agreement metrics; format-related missingness may bias valid-sample estimates.',
                        'Human retest reliability is not a mathematical upper bound on judge agreement.']}
     report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds,attempted)
+    report['status']='awaiting_human' if report['automated_status']=='complete' and (any(pending.values()) or report['retest_pending']>0 or any(report['pairwise_human_pending'].values())) else report['automated_status']
     structured_retries=sum(row.get('status')=='success' and row.get('provider_metadata',{}).get('structured_output',False) for row in judgments)
     if structured_retries:
         report['execution_changes'].append(f'{structured_retries} Gemini pairwise requests completed with an explicit JSON Schema after malformed JSON replies; prompts, candidate order and winner categories were unchanged.')
