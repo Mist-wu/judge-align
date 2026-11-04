@@ -1,0 +1,10 @@
+{
+  "experiment": "E4",
+  "run_id": "E4-qwen-formal-001",
+  "source": "/content/experiment-runs/E4-qwen-formal-001/workspace/results",
+  "destination": "gdrive:exp/runs/E4/E4-qwen-formal-001",
+  "started_at": "2026-11-04T12:27:00.035266+00:00",
+  "state": "verified",
+  "verification": "rclone_copy_exit_status",
+  "ended_at": "2026-11-04T12:27:08.869508+00:00"
+}

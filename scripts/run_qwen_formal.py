@@ -31,6 +31,9 @@ install=subprocess.run([sys.executable,'-m','pip','install','-e','.[qwen]'])
 if install.returncode:
     receipt.update(state='dependency_failed',returncode=install.returncode);save();checkpoint()
     raise SystemExit(install.returncode)
+# The Colab image's preinstalled torchvision targets its newer torch and breaks
+# Transformers' text-model import. Vision support is not used by this run.
+subprocess.run([sys.executable,'-m','pip','uninstall','-y','torchvision'],check=True)
 import torch
 receipt['hardware']={'gpu':torch.cuda.get_device_name(),'gpu_memory_bytes':torch.cuda.get_device_properties(0).total_memory,
                      'torch':torch.__version__,'cuda':torch.version.cuda,'quantization':'bitsandbytes NF4 4-bit'}
