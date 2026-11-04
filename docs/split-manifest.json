@@ -5,7 +5,8 @@
   "overlap_audit": {
     "same_role_prefix_pairs": 17,
     "cross_role_prefix_pairs": 13,
-    "initial_cross_split_pairs": 10
+    "initial_cross_split_pairs": 10,
+    "final_cross_split_pairs": 0
   },
   "selection_rule": "Highest development Empathy QWK; lexicographic provider/style breaks ties.",
   "case_split": {
