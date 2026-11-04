@@ -1,0 +1,37 @@
+{
+  "commit": "c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c",
+  "fetched_at": "2026-11-04T11:13:47.383442+00:00",
+  "license": "MIT (repository LICENSE)",
+  "files": [
+    {
+      "url": "https://raw.githubusercontent.com/morecry/CharacterEval/c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c/LICENSE",
+      "file": "LICENSE",
+      "sha256": "0ed05348cea505bed2e23dd9b2f99b81b36148422071e2793ae2076ac4834e9b",
+      "bytes": 1064
+    },
+    {
+      "url": "https://raw.githubusercontent.com/morecry/CharacterEval/c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c/rm_train_data.json",
+      "file": "rm_train_data.json",
+      "sha256": "0fc906584b5edef50918a38868b732150943d941d6b14e80208af15b4b9a1462",
+      "bytes": 6897423
+    },
+    {
+      "url": "https://raw.githubusercontent.com/morecry/CharacterEval/c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c/data/character_profiles.json",
+      "file": "character_profiles.json",
+      "sha256": "d9b4c9f7ab63b89b3c348ae88b43c87872f0f6a5cb06d7f31cbe64a630e6434e",
+      "bytes": 191240
+    },
+    {
+      "url": "https://raw.githubusercontent.com/morecry/CharacterEval/c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c/results/generation_trans_qwen_7b.jsonl",
+      "file": "generation_trans_qwen_7b.jsonl",
+      "sha256": "a47170faa913daa5084ea794335361ac183e1c6119c0c6a839d5885bb85f648c",
+      "bytes": 7937930
+    },
+    {
+      "url": "https://raw.githubusercontent.com/morecry/CharacterEval/c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c/results/generation_trans_baichuan_7b.jsonl",
+      "file": "generation_trans_baichuan_7b.jsonl",
+      "sha256": "8775735d170049054957a532c8c0b9dd7a8a0fe638f696875db33dce49a593af",
+      "bytes": 7863089
+    }
+  ]
+}
