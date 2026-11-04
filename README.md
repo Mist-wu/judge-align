@@ -1,15 +1,30 @@
-# Judge alignment on Chinese role-play responses
+# 中文角色对话的 judge 与人工评分一致性
 
-Compare DeepSeek, Gemini and Qwen judges with actual human labels, preserving missing-label boundaries and positional controls.
+三类 judge 与 CharacterEval 已公开共情评分的一致性有限；本次结果不足以支持用模型评分替代人工标注。
 
-| Verified preparation | Count |
-|---|---:|
-| Sampled real Empathy-labelled responses | 200 |
-| Distinct same-context candidate pairs | 200 |
-| Planned judge requests, including both pair orders | 3,000 |
+逐条打分的 1,800 次原定请求已执行完毕，位置交换评测仍在运行；完整执行状态见 `HANDOFF.md` 和本机 `docs/formal-progress.json`。以下逐条打分结果来自真实输出，格式失败保持缺失。
 
-**Formal metrics are pending; these counts are preparation results, not evidence of judge quality.** Formal Gemini 3.8-flash scoring is running under `exp-e4-apis.service`; DeepSeek flash continues under `exp-e4-deepseek.service`. Existing successful records are reused. Other custom dimensions need human labels. API judges run on the server; Qwen runs only on an allocated CUDA Colab runtime, independent of the Mac.
+| Judge | 写法 | 有效 N | 共情 QWK [95% CI] | Spearman [95% CI] |
+|---|---|---:|---:|---:|
+| deepseek | direct | 200 | 0.184 [0.060, 0.296] | 0.199 [0.062, 0.329] |
+| deepseek | rationale | 200 | 0.250 [0.110, 0.365] | 0.262 [0.117, 0.390] |
+| deepseek | anchored | 200 | 0.127 [0.006, 0.250] | 0.135 [-0.002, 0.271] |
+| gemini | direct | 200 | 0.185 [0.071, 0.299] | 0.207 [0.073, 0.333] |
+| gemini | rationale | 200 | 0.175 [0.074, 0.278] | 0.200 [0.067, 0.330] |
+| gemini | anchored | 200 | 0.157 [0.060, 0.258] | 0.170 [0.042, 0.287] |
+| qwen | direct | 198 | 0.097 [0.005, 0.187] | 0.135 [0.005, 0.260] |
+| qwen | rationale | 196 | 0.140 [0.025, 0.248] | 0.185 [0.043, 0.318] |
+| qwen | anchored | 199 | 0.126 [-0.011, 0.240] | 0.114 [-0.027, 0.239] |
 
+- 九组 QWK 点估计为 **0.097–0.250**，置信区间大量重叠，不据此宣称某个 judge 优于其他模型。
+- 按固定开发集选择 **qwen / anchored**；公平比较使用全部写法共同有效的 **193** 条样本。独立测试 n=157，QWK **0.125 [-0.016, 0.253]**，区间包含零。该提示只作为开发集选出的候选保存，不宣称已验证为可靠 judge。
+- 原始共情标注覆盖 **200** 条；其余 **3** 个自定义维度、两两偏好及 **50** 条隔日重标仍需真实人工完成。
+
+开发/测试按对话前缀连通组划分为 39/161 条；不能把同一对话的不同角色或不同轮次分到两边。193 条共同有效样本中实际开发/测试为 36/157。划分修正、原始格式有效率、重试与尾逗号恢复均在报告中披露；没有按结果重新调提示或修改人工原分。
+
+所有置信区间使用 1,000 次对话组 bootstrap。公开 reward-model 训练数据可能受基座模型污染，自定义共情锚点也并非原标注说明的逐字复制，因此不应把分歧直接解释为人工或模型一方必然错误。
+
+逐条解释见 [20 个分歧案例](docs/disagreement-analysis.md)，统计见 [正式报告](results/report.md)，开发集候选提示见 [selected-prompt.json](results/selected-prompt.json)。这些案例解释来自 Codex 分析，不是新人工标注。
 ## Prepare the full experiment
 
 Python 3.11+ suffices; the API and analysis paths have no third-party dependencies.
