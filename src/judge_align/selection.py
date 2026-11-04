@@ -10,7 +10,7 @@ def select_on_development(cases, successful, providers, references, rounds=1000)
     dev = set(contexts[:max(1, len(contexts)//5)])
     partition = {case['id']: 'development' if case['context_id'] in dev else 'test' for case in primary}
     manifest = {'method': 'SHA256(E4-context-split-42:context_id), lowest 20% of contexts = development',
-                'fixed_at': '2026-11-04T12:48:00Z',
+                'fixed_at': '2026-11-04T12:47:22Z',
                 'timing': 'Fixed after requests started, before inspecting aggregate rankings; not a preregistration.',
                 'selection_rule': 'Highest development Empathy QWK; lexicographic provider/style breaks ties.',
                 'case_split': partition, 'context_counts': {'development': len(dev), 'test': len(contexts)-len(dev)},

@@ -1,6 +1,6 @@
 {
   "method": "SHA256(E4-context-split-42:context_id), lowest 20% of contexts = development",
-  "fixed_at": "2026-11-04T12:48:00Z",
+  "fixed_at": "2026-11-04T12:47:22Z",
   "timing": "Fixed after requests started, before inspecting aggregate rankings; not a preregistration.",
   "selection_rule": "Highest development Empathy QWK; lexicographic provider/style breaks ties.",
   "case_split": {
