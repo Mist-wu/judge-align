@@ -12,7 +12,7 @@ from .providers import ProviderError,estimated_cost,make_provider,resolve_model
 from .report import build_report
 
 
-def run_requests(config,requests,output,provider_name,max_calls=None,retry_unknown=False,provider_factory=make_provider):
+def run_requests(config,requests,output,provider_name,retry_unknown=False,provider_factory=make_provider):
     if provider_name not in config['providers']:
         raise ValueError('Unknown provider')
     cfg=dict(config['providers'][provider_name]);cfg['model']=resolve_model(cfg)
@@ -41,9 +41,6 @@ def run_requests(config,requests,output,provider_name,max_calls=None,retry_unkno
             exhausted=sum(states.get(digest([r['request_id'],cfg]))=='failed' for r in requests if r['provider']==provider_name)
             if exhausted:raise ValueError(f'{exhausted} requests exhausted retries; investigate failures')
             return {'attempted':0,'succeeded':0,'remaining':0}
-        if max_calls is not None:
-            if max_calls<1:raise ValueError('max_calls must be positive')
-            pending=pending[:max_calls]
         provider=provider_factory(cfg)
         meta=metadata(config)
         attempted=succeeded=0
@@ -80,7 +77,7 @@ def parser():
     prep.add_argument('--cases',default='data/cases.jsonl');prep.add_argument('--pairs',default='data/pairs.jsonl')
     req=sub.add_parser('requests');req.add_argument('--config',default='configs/main.json');req.add_argument('--cases',default='data/cases.jsonl');req.add_argument('--pairs',default='data/pairs.jsonl');req.add_argument('--output',default='data/requests.jsonl')
     ann=sub.add_parser('annotations');ann.add_argument('--cases',default='data/cases.jsonl');ann.add_argument('--pairs',default='data/pairs.jsonl');ann.add_argument('--output',default='data/human-template.jsonl');ann.add_argument('--validate');ann.add_argument('--round',choices=['initial','retest'],default='initial')
-    run=sub.add_parser('run');run.add_argument('--config',default='configs/main.json');run.add_argument('--requests',default='data/requests.jsonl');run.add_argument('--provider',required=True);run.add_argument('--output',required=True);run.add_argument('--max-calls',type=int);run.add_argument('--retry-unknown',action='store_true')
+    run=sub.add_parser('run');run.add_argument('--config',default='configs/main.json');run.add_argument('--requests',default='data/requests.jsonl');run.add_argument('--provider',required=True);run.add_argument('--output',required=True);run.add_argument('--retry-unknown',action='store_true')
     rep=sub.add_parser('report');rep.add_argument('--config',default='configs/main.json');rep.add_argument('--cases',default='data/cases.jsonl');rep.add_argument('--pairs',default='data/pairs.jsonl');rep.add_argument('--judgments',nargs='+',required=True);rep.add_argument('--human');rep.add_argument('--outdir',default='results')
     return p
 
@@ -111,7 +108,7 @@ def main(argv=None):
         elif args.command=='run':
             cfg=json.loads(Path(args.config).read_text());rows=read_jsonl(args.requests)
             if not rows:raise ValueError('No requests; run requests first')
-            outcome=run_requests(cfg,rows,args.output,args.provider,args.max_calls,args.retry_unknown)
+            outcome=run_requests(cfg,rows,args.output,args.provider,args.retry_unknown)
             print(json.dumps(outcome))
             if outcome['attempted']!=outcome['succeeded']:return 1
         elif args.command=='report':

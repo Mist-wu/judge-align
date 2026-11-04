@@ -128,7 +128,7 @@ class RunnerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             output=Path(d)/'out.jsonl'
             requests=list(make_requests([case()],[],['fake']))
-            first=run_requests(cfg(),requests,output,'fake',max_calls=1,provider_factory=FakeProvider)
+            first=run_requests(cfg(),requests[:1],output,'fake',provider_factory=FakeProvider)
             self.assertEqual(first['succeeded'],1)
             run_requests(cfg(),requests,output,'fake',provider_factory=FakeProvider)
             self.assertEqual(FakeProvider.calls,3)

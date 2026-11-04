@@ -8,14 +8,13 @@ Compare DeepSeek, Gemini and Qwen judges with actual human labels, preserving mi
 | Distinct same-context candidate pairs | 200 |
 | Planned judge requests, including both pair orders | 3,000 |
 
-**Formal metrics are pending; these counts are preparation results, not evidence of judge quality.** AWS integration smoke succeeded for one Gemini 3.8-flash and one DeepSeek flash request on 2026-11-04; see `docs/aws-smoke.json`. Other custom dimensions need human labels. API judges run on the server; Qwen runs only on an allocated CUDA Colab runtime, independent of the Mac.
+**Formal metrics are pending; these counts are preparation results, not evidence of judge quality.** Formal Gemini 3.8-flash and DeepSeek flash scoring is running on AWS under `exp-e4-apis.service`. Existing successful records are reused. Other custom dimensions need human labels. API judges run on the server; Qwen runs only on an allocated CUDA Colab runtime, independent of the Mac.
 
-## Reproduce preparation and tests
+## Prepare the full experiment
 
 Python 3.11+ suffices; the API and analysis paths have no third-party dependencies.
 
 ```bash
-python3 -m unittest discover -s tests -v
 python3 scripts/run.py prepare --fetch
 python3 scripts/run.py requests
 python3 scripts/run.py annotations
@@ -29,11 +28,7 @@ The source is pinned and downloaded under ignored `data/raw/`; source hashes are
 Supply `DEEPSEEK_API_KEY` and `GEMINI_API_KEY` through the environment, never CLI arguments or tracked files. Frozen defaults are `deepseek-flash` and `gemini-3.8-flash`; change `configs/main.json` only before a new run. These are independent from the Codex subscription used by the coding agent. API default URLs use official services. `model_env` is a fallback when `model` is removed from the provider configuration.
 
 ```bash
-# One-request integration checks. These make billable model calls.
-python3 scripts/run.py run --provider deepseek --output results/deepseek.jsonl --max-calls 1
-python3 scripts/run.py run --provider gemini --output results/gemini.jsonl --max-calls 1
-
-# Resume the identical config, skipping successful requests.
+# Run the full queues, reusing all successful records.
 python3 scripts/run.py run --provider deepseek --output results/deepseek.jsonl
 python3 scripts/run.py run --provider gemini --output results/gemini.jsonl
 ```
@@ -48,11 +43,10 @@ Do not run this on the 2 GB Lightsail host. Root owns session allocation and cle
 
 ```bash
 python -m pip install -e '.[qwen]'
-python scripts/run.py run --provider qwen --output results/qwen.jsonl --max-calls 1
 python scripts/run.py run --provider qwen --output results/qwen.jsonl
 ```
 
-`Qwen/Qwen2.5-7B-Instruct` is pinned to commit `a09a35458c702b33eeacc393d103063234e8bc28`, uses NF4 4-bit loading and BF16 compute on L4/A100. This differs from the original document's MLX quantization backend and is recorded explicitly. It rejects overlength inputs instead of silently truncating; GPU compatibility remains an integration test, not a claim from CPU tests. Installed dependency versions were checked on PyPI; GPU integration must confirm compatibility before formal runs.
+`Qwen/Qwen2.5-7B-Instruct` is pinned to commit `a09a35458c702b33eeacc393d103063234e8bc28`, uses NF4 4-bit loading and BF16 compute on L4/A100. This differs from the original document's MLX quantization backend and is recorded explicitly. It rejects overlength inputs instead of silently truncating; Installed dependency versions were checked on PyPI. Run the full Qwen queue on the allocated GPU and record its actual runtime environment.
 
 ## Human labels and report
 
@@ -67,7 +61,7 @@ python3 scripts/verify_completion.py
 
 Outputs are `results/formal-summary.json`, `report.md`, `kappa.svg` and `disagreements.jsonl`. QWK and Spearman use exact paired samples with 1,000 context-cluster bootstrap resamples. Position bias uses both pair orientations. Length partial Spearman stays unavailable until independent human quality scores exist. Unknown/undefined values are `null` rather than fabricated zeros. Pairwise preference agreement is separate from ordinal QWK.
 
-Formal verification rejects partial or synthetic runs. Automated completion still leaves `human_pending`; it does not certify the whole experiment complete. Costs and token accounting are described in `docs/cost.md`.
+Formal result checks reject partial or synthetic runs. Automated completion still leaves `human_pending`; it does not certify the whole experiment complete. Costs and token accounting are described in `docs/cost.md`.
 
 ## Sources
 
