@@ -11,10 +11,13 @@ import tarfile
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--data-archive',required=True)
+parser.add_argument('--requests',default='data/requests.jsonl')
+parser.add_argument('--session',default='exp-e4-qwen')
+parser.add_argument('--retry-unknown',action='store_true')
 args=parser.parse_args()
 root=Path.cwd();results=root/'results';results.mkdir(exist_ok=True)
 run_id=os.environ.get('EXPERIMENT_RUN_ID','E4-qwen-formal-001')
-receipt={'run_id':run_id,'session':'exp-e4-qwen','started_at':datetime.now(timezone.utc).isoformat(),
+receipt={'run_id':run_id,'session':args.session,'started_at':datetime.now(timezone.utc).isoformat(),
          'model':'Qwen/Qwen2.5-7B-Instruct','revision':'a09a35458c702b33eeacc393d103063234e8bc28',
          'target_requests':1000,'state':'installing','commit':os.environ.get('EXPERIMENT_COMMIT')}
 receipt_path=results/'qwen-run.json'
@@ -40,7 +43,10 @@ receipt['hardware']={'gpu':torch.cuda.get_device_name(),'gpu_memory_bytes':torch
 (results/'qwen-env.txt').write_text(subprocess.check_output([sys.executable,'-m','pip','freeze'],text=True))
 receipt.update(state='running');save()
 print(json.dumps(receipt),flush=True)
-process=subprocess.Popen([sys.executable,'scripts/run.py','run','--provider','qwen','--output','results/qwen.jsonl'])
+command=[sys.executable,'scripts/run.py','run','--provider','qwen','--requests',args.requests,'--output','results/qwen.jsonl']
+if args.retry_unknown:command.append('--retry-unknown')
+receipt['command']=command;receipt['requests_file']=args.requests;save()
+process=subprocess.Popen(command)
 while True:
     try:
         code=process.wait(timeout=120)

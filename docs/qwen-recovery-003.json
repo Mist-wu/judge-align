@@ -1,0 +1,15 @@
+{
+  "at": "2026-11-04T13:55:36.441080+00:00",
+  "previous_run": "E4-qwen-formal-002",
+  "new_run": "E4-qwen-formal-003",
+  "previous_session": "exp-e4-qwen",
+  "previous_session_state": "Missing from actual Colab assignments; not stopped by this agent",
+  "checkpoint_source": "gdrive:exp/runs/E4/E4-qwen-formal-002/qwen.jsonl",
+  "last_terminal_at": "2026-11-04T13:45:20.924487+00:00",
+  "preserved_terminal_requests": 641,
+  "remaining_requests": 359,
+  "lost_inflight_request_ids": [
+    "1dc9fcac701787939a117c289b866210b60b78c55d81d078583cbcb6e4a79780"
+  ],
+  "resume_policy": "Only IDs without checkpoint terminal outcomes; existing successful and format-failed outputs are excluded; --retry-unknown explicitly permits the lost in-flight row."
+}
