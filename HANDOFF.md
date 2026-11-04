@@ -2,6 +2,8 @@
 
 ## Running now
 
+The Mac E4 agent is the current controller; server pi is paused. Local checkout is fast-forwarded from the server before further work. Live downloaded-result counts are in local `docs/formal-progress.json`. The A100 runtime is now shared with E2 in its own `/content/e2-venv` and run directory: **do not release `exp-e4-qwen` when E4 finishes until root confirms E2 is also done**. E4 completion and analysis do not need to wait for E2.
+
 `exp-e4-apis.service` on `agent-01` continues Gemini **gemini-3.8-flash** unchanged. The separate `exp-e4-deepseek.service` resumes **deepseek-flash** with 8192 output-token capacity. Both run as `exp-runner`. Each full queue contains 1,000 requests: 200 cases × 3 pointwise prompt styles plus 200 pairs × 2 orientations. Already successful records are reused. There is no request-count cap.
 
 - Working directory: `/srv/exp-runner/repos/judge-align`
@@ -22,7 +24,8 @@ Stop both workers if requested: `sudo systemctl stop exp-e4-apis.service exp-e4-
 1. Let the full API queues finish; inspect any provider failure and resume the corresponding queue with `python3 scripts/run.py run --provider <provider> --output results/<provider>.jsonl`.
 2. Qwen continuation runs on A100 session `exp-e4-qwen`, run ID `E4-qwen-formal-002`. It processes the 1000 requests and checkpoints to `gdrive:exp/runs/E4/E4-qwen-formal-002` every two minutes and at exit. Poll: `python3 -m exp_common.colab --poll --session exp-e4-qwen --run-id E4-qwen-formal-002 --output-dir /srv/exp-runner/state/remote/E4-qwen-formal-002`. Collect with `python3 -m exp_common.collect --session exp-e4-qwen --run-id E4-qwen-formal-002 --output-dir /srv/exp-runner/state/remote/E4-qwen-formal-002 results` before releasing the session. Submission: `python3 -m exp_common.colab --repo /srv/exp-runner/repos/judge-align --session exp-e4-qwen --run-id E4-qwen-formal-002 --output-dir /srv/exp-runner/state/remote/E4-qwen-formal-002 --detach --env-file /content/experiment-env.json --artifact-path results -- python3 scripts/run_qwen_formal.py --data-archive /content/E4-qwen-data.tgz`. The earlier receipt remains at `/srv/exp-runner/state/remote/E4-qwen-formal-001`.
 3. Build the full report with `python3 scripts/run.py report --judgments results/deepseek.jsonl results/gemini.jsonl results/qwen.jsonl`.
-4. Fill README and `docs/cost.md` directly from actual result records and costs; no separate verification gate is required.
+4. Run `python3 scripts/reconcile_cost.py`, then fill README and `docs/cost.md` from actual result records. The report selects a prompt on the fixed 40-case development split and reports it on 160 held-out cases; the split was fixed before aggregate rankings were inspected, after generation started. No separate verification gate is required.
+5. Review the 20 distinct highest-disagreement cases in `results/disagreements.jsonl`; any agent-written explanation is an analytic hypothesis, not a new human gold label.
 
 ## Human-data boundary
 

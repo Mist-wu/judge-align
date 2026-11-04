@@ -6,11 +6,11 @@ Each `results/<provider>.jsonl` records every started/terminal request, exact mo
 
 `pricing_usd_per_million` starts at null. Fill official current per-million input/output/cache prices in a frozen configuration before formal work if dollar estimates are needed. Null pricing is reported as unknown, never zero. Provider invoices remain authoritative. Failed parse responses can still consume tokens and are included in known estimated spend. There is no artificial budget cutoff.
 
-Root owns Colab allocation. Record each Qwen session's ID, GPU, start/stop, actual CU rate and balance here after it ends; do not start a new session from this repository. Qwen emits torch/CUDA/GPU/model revision metadata. No GPU session exists for E4 yet.
+Root owns Colab allocation. Record each Qwen session's ID, GPU, start/stop, actual CU rate and balance here after it ends; do not start a new session from this repository. Qwen emits torch/CUDA/GPU/model revision metadata. E4 is running on the existing `exp-e4-qwen` A100 session; details follow below.
 
 | Session | GPU | Start/end UTC | Rate CU/h | CU consumed | Status |
 |---|---|---|---|---|---|
-| — | — | — | — | — | Not started |
+| exp-e4-qwen | A100-SXM4-40GB | 2026-11-04 12:20:25 / running | 6.73 (allocation delta observed by coordinator) | Pending end time; shared with E2 from later in the run | Running |
 
 ## Recorded API usage — 2026-11-04
 
@@ -31,4 +31,9 @@ At 2026-11-04 12:00 UTC, DeepSeek output capacity was increased from 1536 to 819
 
 ## E4 Qwen allocation
 
-A single A100 request succeeded at 2026-11-04 12:20:25 UTC: session `exp-e4-qwen`, endpoint `gpu-a100-s-ass1c0-28f4fskn9e3s6`. Full 1000-request inference uses run ID `E4-qwen-formal-001`; actual GPU and torch/CUDA versions are written to `results/qwen-run.json`, and Drive copy receipts to `results/qwen-drive-copy.json`. Record final CU balance after collection and stop.
+A single A100 request succeeded at 2026-11-04 12:20:25 UTC: session `exp-e4-qwen`, endpoint `gpu-a100-s-ass1c0-28f4fskn9e3s6`. Original run `E4-qwen-formal-001` failed before scoring because of a torch/torchvision mismatch; its failure artifacts are preserved. Full 1000-request inference continues as `E4-qwen-formal-002` after removing unused torchvision; actual GPU and torch/CUDA versions are written to `results/qwen-run.json`, and Drive copy receipts to `results/qwen-drive-copy.json`. Record final CU balance after collection and stop.
+
+
+Current usage can be recomputed with `python3 scripts/reconcile_cost.py`. It counts failed replies with returned usage and keeps missing usage unknown; the one original empty-content failure has unknown tokens. The post-hoc JSON uses Gemini paid list prices (free-tier eligibility unknown) and the actual off-peak timing of this campaign. It does not rewrite raw inference configuration or provider events.
+
+The A100 is shared with E2 in an independent environment. Its CU rate is billed per runtime, not separately per process. Shared-period CU cannot be uniquely assigned to E4 from aggregate account balance. Do not release the runtime until both experiments are collected.
