@@ -1,0 +1,92 @@
+{
+  "seed": 42,
+  "providers": {
+    "gemini": {
+      "type": "gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "key_env": "GEMINI_API_KEY",
+      "model_env": "GEMINI_MODEL",
+      "max_output_tokens": 8192,
+      "pricing_usd_per_million": null,
+      "model": "gemini-3.8-flash",
+      "response_json_schema": {
+        "type": "object",
+        "properties": {
+          "winners": {
+            "type": "object",
+            "properties": {
+              "persona": {
+                "type": "string",
+                "enum": [
+                  "A",
+                  "B",
+                  "tie"
+                ]
+              },
+              "empathy": {
+                "type": "string",
+                "enum": [
+                  "A",
+                  "B",
+                  "tie"
+                ]
+              },
+              "quality": {
+                "type": "string",
+                "enum": [
+                  "A",
+                  "B",
+                  "tie"
+                ]
+              },
+              "safety": {
+                "type": "string",
+                "enum": [
+                  "A",
+                  "B",
+                  "tie"
+                ]
+              }
+            },
+            "required": [
+              "persona",
+              "empathy",
+              "quality",
+              "safety"
+            ],
+            "additionalProperties": false
+          },
+          "reasons": {
+            "type": "object",
+            "properties": {
+              "persona": {
+                "type": "string"
+              },
+              "empathy": {
+                "type": "string"
+              },
+              "quality": {
+                "type": "string"
+              },
+              "safety": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "persona",
+              "empathy",
+              "quality",
+              "safety"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "winners",
+          "reasons"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

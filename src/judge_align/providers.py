@@ -65,6 +65,8 @@ class APIProvider:
             payload = {"systemInstruction":{"parts":[{"text":messages[0]["content"]}]},
                 "contents":[{"role":"user","parts":[{"text":messages[1]["content"]}]}],
                 "generationConfig":{"temperature":0,"maxOutputTokens":cfg.get("max_output_tokens",1536),"responseMimeType":"application/json"}}
+            if cfg.get('response_json_schema'):
+                payload['generationConfig']['responseJsonSchema']=cfg['response_json_schema']
             result = post(url,payload,{"x-goog-api-key":self.key})
             candidates = result.get("candidates",[])
             if not candidates:
@@ -76,7 +78,8 @@ class APIProvider:
             usage={"input_tokens":u.get("promptTokenCount"),"output_tokens":u.get("candidatesTokenCount"),
                    "thought_tokens":u.get("thoughtsTokenCount",0),"cached_input_tokens":u.get("cachedContentTokenCount",0),"provider_usage":u}
             return text,usage,{"model":result.get("modelVersion",self.model),"finish_reason":candidates[0].get("finishReason"),
-                               "max_output_tokens":payload['generationConfig']['maxOutputTokens']}
+                               "max_output_tokens":payload['generationConfig']['maxOutputTokens'],
+                               "structured_output":bool(cfg.get('response_json_schema'))}
         raise ProviderError("Unsupported API provider type")
 
 

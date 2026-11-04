@@ -138,6 +138,9 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                        'Pairwise choices are not ordinal 1–5 scores and are not entered in the QWK heatmap.',
                        'Human retest reliability is not a mathematical upper bound on judge agreement.']}
     report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds)
+    structured_retries=sum(row.get('status')=='success' and row.get('provider_metadata',{}).get('structured_output',False) for row in judgments)
+    if structured_retries:
+        report['execution_changes'].append(f'{structured_retries} Gemini pairwise requests completed with an explicit JSON Schema after malformed JSON replies; prompts, candidate order and winner categories were unchanged.')
     atomic_json(out/'split-manifest.json',report['prompt_selection']['manifest'])
     atomic_json(out/'formal-summary.json',report)
     by_case=defaultdict(list)
