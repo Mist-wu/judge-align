@@ -116,7 +116,9 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     pending={d:sum(d not in references[c['id']] for c in primary) for d in DIMENSIONS}
     report={'run_kind':'formal','created_at':now(),'source_commit':primary[0].get('source_commit') if primary else None,
         'population':config.get('data_population'),'primary_count':len(primary),'pair_count':len(pairs),
-        'successful_requests':len(successful),'expected_requests':expected,'failed_attempts':len(failed),
+        'successful_requests':len(successful),'expected_requests':expected,
+        'failed_attempts':sum(row.get('status')=='failed' for row in judgments),
+        'failed_request_configs':len(failed),
         'automated_status':'complete' if len(successful)==expected and len(primary)==config['sample_count'] and len(pairs)==config['sample_count'] else 'partial',
         'human_pending':pending,'pairwise_human_pending':{d:sum(d not in pair_references[p['id']] for p in pairs) for d in DIMENSIONS},
         'retest_pending':50-sum('initial' in r and 'retest' in r for r in retest.values()),
