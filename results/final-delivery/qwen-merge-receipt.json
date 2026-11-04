@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-11-04T14:29:54.231468+00:00",
+  "source": "results/recovered-003/qwen.jsonl",
+  "derived_recoveries": "results/qwen-recoveries.jsonl",
+  "output": "results/qwen.jsonl",
+  "unique_terminal_requests": 1000,
+  "analyzable_requests": 980,
+  "strict_valid_requests": 979,
+  "format_recovered_requests": 1,
+  "invalid_requests": 20,
+  "events": 2002,
+  "sha256": "46808f3e0f8de86ab0a6addc5981076fc91a8647d58e03410cb841b94b9ca4cf",
+  "new_model_requests_for_merge": 0
+}

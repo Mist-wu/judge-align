@@ -1,0 +1,41 @@
+{
+  "created_at": "2026-11-04T14:30:47.701259+00:00",
+  "pricing_verified_at": "2026-11-04",
+  "pricing_scope": "2026-11-04 10:00-24:00 UTC; standard paid Gemini and off-peak DeepSeek",
+  "providers": {
+    "deepseek": {
+      "terminal_attempts": 1005,
+      "success_attempts": 1000,
+      "input_tokens": 1145784,
+      "output_tokens": 863771,
+      "cached_input_tokens": 634621,
+      "additional_thinking_tokens": 0,
+      "failed_attempts": 5,
+      "estimated_paid_list_usd": 0.59684091,
+      "unknown_cost_terminal_attempts": 1,
+      "currently_inflight_attempts": 0
+    },
+    "gemini": {
+      "terminal_attempts": 1016,
+      "success_attempts": 991,
+      "input_tokens": 1208802,
+      "output_tokens": 147241,
+      "cached_input_tokens": 0,
+      "additional_thinking_tokens": 405876,
+      "failed_attempts": 25,
+      "estimated_paid_list_usd": 2.98079025,
+      "unknown_cost_terminal_attempts": 0,
+      "currently_inflight_attempts": 0
+    }
+  },
+  "known_estimated_paid_list_usd": 3.57763116,
+  "sources": [
+    "https://aistudio.google.com/docs/pricing#gemini-3.8-flash",
+    "https://api-docs.deepseek.com/quick_start/pricing/"
+  ],
+  "limitations": [
+    "List-price estimate, not an invoice; Gemini account free-tier status is unknown.",
+    "Missing provider usage and unfinished calls have unknown cost, not zero.",
+    "Qwen Colab compute units are accounted separately from API dollars."
+  ]
+}

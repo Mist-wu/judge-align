@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="426">
+<rect width="100%" height="100%" fill="white"/>
+<text x="12" y="25" font-family="sans-serif" font-size="16">Canonical outcome inconsistency after swapping A/B; 95% cluster bootstrap CI</text>
+<line x1="610" x2="610" y1="50" y2="406" stroke="#777"/>
+<text x="370" y="48" font-family="sans-serif" font-size="11">-1</text>
+<text x="485.0" y="48" font-family="sans-serif" font-size="11">-0.5</text>
+<text x="600" y="48" font-family="sans-serif" font-size="11">0</text>
+<text x="715.0" y="48" font-family="sans-serif" font-size="11">0.5</text>
+<text x="830" y="48" font-family="sans-serif" font-size="11">1</text>
+<text x="12" y="75" font-family="sans-serif" font-size="11">deepseek/persona (n=200)</text>
+<rect x="610" y="60" width="62.1" height="18" fill="#5a85b5"/>
+<line x1="657.5449420103092" x2="686.6666666666666" y1="69" y2="69" stroke="#111" stroke-width="2"/>
+<text x="855" y="75" font-family="sans-serif" font-size="11">0.270</text>
+<text x="12" y="103" font-family="sans-serif" font-size="11">deepseek/empathy (n=200)</text>
+<rect x="610" y="88" width="71.3" height="18" fill="#5a85b5"/>
+<line x1="666.9244873539486" x2="695.3985731688352" y1="97" y2="97" stroke="#111" stroke-width="2"/>
+<text x="855" y="103" font-family="sans-serif" font-size="11">0.310</text>
+<text x="12" y="131" font-family="sans-serif" font-size="11">deepseek/quality (n=200)</text>
+<rect x="610" y="116" width="59.800000000000004" height="18" fill="#5a85b5"/>
+<line x1="656.4766839378239" x2="683.6554067043134" y1="125" y2="125" stroke="#111" stroke-width="2"/>
+<text x="855" y="131" font-family="sans-serif" font-size="11">0.260</text>
+<text x="12" y="159" font-family="sans-serif" font-size="11">deepseek/safety (n=200)</text>
+<rect x="610" y="144" width="12.65" height="18" fill="#5a85b5"/>
+<line x1="615.5364583333334" x2="630.9117443470235" y1="153" y2="153" stroke="#111" stroke-width="2"/>
+<text x="855" y="159" font-family="sans-serif" font-size="11">0.055</text>
+<text x="12" y="187" font-family="sans-serif" font-size="11">gemini/persona (n=192)</text>
+<rect x="610" y="172" width="22.760416666666664" height="18" fill="#5a85b5"/>
+<line x1="623.8232581967213" x2="642.5003272251308" y1="181" y2="181" stroke="#111" stroke-width="2"/>
+<text x="855" y="187" font-family="sans-serif" font-size="11">0.099</text>
+<text x="12" y="215" font-family="sans-serif" font-size="11">gemini/empathy (n=192)</text>
+<rect x="610" y="200" width="57.5" height="18" fill="#5a85b5"/>
+<line x1="652.6771520618556" x2="683.0756392045455" y1="209" y2="209" stroke="#111" stroke-width="2"/>
+<text x="855" y="215" font-family="sans-serif" font-size="11">0.250</text>
+<text x="12" y="243" font-family="sans-serif" font-size="11">gemini/quality (n=192)</text>
+<rect x="610" y="228" width="19.166666666666664" height="18" fill="#5a85b5"/>
+<line x1="620.8376963350786" x2="638.4447035745422" y1="237" y2="237" stroke="#111" stroke-width="2"/>
+<text x="855" y="243" font-family="sans-serif" font-size="11">0.083</text>
+<text x="12" y="271" font-family="sans-serif" font-size="11">gemini/safety (n=192)</text>
+<rect x="610" y="256" width="0.0" height="18" fill="#5a85b5"/>
+<line x1="610.0" x2="610.0" y1="265" y2="265" stroke="#111" stroke-width="2"/>
+<text x="855" y="271" font-family="sans-serif" font-size="11">0.000</text>
+<text x="12" y="299" font-family="sans-serif" font-size="11">qwen/persona (n=187)</text>
+<rect x="610" y="284" width="115.6149732620321" height="18" fill="#5a85b5"/>
+<line x1="709.4586500563063" x2="741.2501636125654" y1="293" y2="293" stroke="#111" stroke-width="2"/>
+<text x="855" y="299" font-family="sans-serif" font-size="11">0.503</text>
+<text x="12" y="327" font-family="sans-serif" font-size="11">qwen/empathy (n=187)</text>
+<rect x="610" y="312" width="121.76470588235294" height="18" fill="#5a85b5"/>
+<line x1="716.9167109732683" x2="747.7605686865483" y1="321" y2="321" stroke="#111" stroke-width="2"/>
+<text x="855" y="327" font-family="sans-serif" font-size="11">0.529</text>
+<text x="12" y="355" font-family="sans-serif" font-size="11">qwen/quality (n=187)</text>
+<rect x="610" y="340" width="105.77540106951872" height="18" fill="#5a85b5"/>
+<line x1="699.9946524064171" x2="732.2306606110652" y1="349" y2="349" stroke="#111" stroke-width="2"/>
+<text x="855" y="355" font-family="sans-serif" font-size="11">0.460</text>
+<text x="12" y="383" font-family="sans-serif" font-size="11">qwen/safety (n=187)</text>
+<rect x="610" y="368" width="107.0053475935829" height="18" fill="#5a85b5"/>
+<line x1="701.9940414507772" x2="732.7546693923172" y1="377" y2="377" stroke="#111" stroke-width="2"/>
+<text x="855" y="383" font-family="sans-serif" font-size="11">0.465</text>
+</svg>

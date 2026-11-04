@@ -1,0 +1,1 @@
+{"run_id": "E4-qwen-formal-003", "state": "failed", "returncode": 1, "started_at_unix": 1793801798.4768064, "git": {"commit": "373a1e00e84f46c6dd3f93a6483ca3e93d8939a9", "dirty": false}, "pid": 6202, "ended_at_unix": 1793802545.4288592, "duration_seconds": 746.9520537853241}

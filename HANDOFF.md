@@ -1,6 +1,6 @@
 # E4 formal execution handoff
 
-Snapshot: **2026-11-04 14:29:05 UTC / 23:29:05 JST**. All **3,000 original requests have terminal outcomes**. There are **2,970 strict-valid outputs plus one separately marked trailing-comma recovery: 2,971 analyzable outputs and 29 remaining format-invalid outputs**. E4 is **`awaiting_human`**. Qwen's final artifacts have been collected, its foreground task has returned, and E2 was explicitly notified to take the GPU at 23:29:05 JST. The Mac E4 agent is generating the final analysis; server pi remains paused.
+Snapshot: **2026-11-04 14:29:05 UTC / 23:29:05 JST**. All **3,000 original requests have terminal outcomes**. There are **2,970 strict-valid outputs plus one separately marked trailing-comma recovery: 2,971 analyzable outputs and 29 remaining format-invalid outputs**. E4 is **`awaiting_human`**. Qwen's final artifacts have been collected, its foreground task has returned, and E2 was explicitly notified to take the GPU at 23:29:05 JST. The final analysis and standalone figures are generated; the PNG has been visually inspected. Server pi remains paused until coordinator handoff.
 
 ## Completed API work
 
@@ -51,7 +51,7 @@ The 359-request batch phase ran from **14:21:27.315849 to 14:28:53.964177 UTC**,
 
 The `003` artifacts and final status have been downloaded, preserving the raw ledger and actual process exit code. The one unambiguous trailing-comma recovery is a separately marked derived record with its original failure and raw text retained. No missing fields or scores were filled, and terminal formatting failures were not regenerated. `results/final-delivery/` contains the canonical merged delivery ledgers, which keep original model attempts and derived recovery records distinct.
 
-The final report and figures are being generated from these collected outputs. To reproduce the analysis from `/Users/wu/Github/judge-align`:
+The final report and figures have been generated from these collected outputs. To reproduce the analysis from `/Users/wu/Github/judge-align`:
 
 ```bash
 python3 scripts/run.py report \

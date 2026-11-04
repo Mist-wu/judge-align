@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1098">
+<rect width="100%" height="100%" fill="white"/>
+<text x="12" y="25" font-family="sans-serif" font-size="16">Length association after control for independent human quality; not causal</text>
+<line x1="610" x2="610" y1="50" y2="1078" stroke="#777"/>
+<text x="370" y="48" font-family="sans-serif" font-size="11">-1</text>
+<text x="485.0" y="48" font-family="sans-serif" font-size="11">-0.5</text>
+<text x="600" y="48" font-family="sans-serif" font-size="11">0</text>
+<text x="715.0" y="48" font-family="sans-serif" font-size="11">0.5</text>
+<text x="830" y="48" font-family="sans-serif" font-size="11">1</text>
+<text x="12" y="75" font-family="sans-serif" font-size="11">deepseek/direct/persona (n=0)</text>
+<text x="618" y="75" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="103" font-family="sans-serif" font-size="11">deepseek/direct/empathy (n=0)</text>
+<text x="618" y="103" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="131" font-family="sans-serif" font-size="11">deepseek/direct/quality (n=0)</text>
+<text x="618" y="131" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="159" font-family="sans-serif" font-size="11">deepseek/direct/safety (n=0)</text>
+<text x="618" y="159" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="187" font-family="sans-serif" font-size="11">deepseek/rationale/persona (n=0)</text>
+<text x="618" y="187" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="215" font-family="sans-serif" font-size="11">deepseek/rationale/empathy (n=0)</text>
+<text x="618" y="215" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="243" font-family="sans-serif" font-size="11">deepseek/rationale/quality (n=0)</text>
+<text x="618" y="243" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="271" font-family="sans-serif" font-size="11">deepseek/rationale/safety (n=0)</text>
+<text x="618" y="271" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="299" font-family="sans-serif" font-size="11">deepseek/anchored/persona (n=0)</text>
+<text x="618" y="299" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="327" font-family="sans-serif" font-size="11">deepseek/anchored/empathy (n=0)</text>
+<text x="618" y="327" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="355" font-family="sans-serif" font-size="11">deepseek/anchored/quality (n=0)</text>
+<text x="618" y="355" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="383" font-family="sans-serif" font-size="11">deepseek/anchored/safety (n=0)</text>
+<text x="618" y="383" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="411" font-family="sans-serif" font-size="11">gemini/direct/persona (n=0)</text>
+<text x="618" y="411" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="439" font-family="sans-serif" font-size="11">gemini/direct/empathy (n=0)</text>
+<text x="618" y="439" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="467" font-family="sans-serif" font-size="11">gemini/direct/quality (n=0)</text>
+<text x="618" y="467" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="495" font-family="sans-serif" font-size="11">gemini/direct/safety (n=0)</text>
+<text x="618" y="495" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="523" font-family="sans-serif" font-size="11">gemini/rationale/persona (n=0)</text>
+<text x="618" y="523" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="551" font-family="sans-serif" font-size="11">gemini/rationale/empathy (n=0)</text>
+<text x="618" y="551" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="579" font-family="sans-serif" font-size="11">gemini/rationale/quality (n=0)</text>
+<text x="618" y="579" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="607" font-family="sans-serif" font-size="11">gemini/rationale/safety (n=0)</text>
+<text x="618" y="607" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="635" font-family="sans-serif" font-size="11">gemini/anchored/persona (n=0)</text>
+<text x="618" y="635" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="663" font-family="sans-serif" font-size="11">gemini/anchored/empathy (n=0)</text>
+<text x="618" y="663" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="691" font-family="sans-serif" font-size="11">gemini/anchored/quality (n=0)</text>
+<text x="618" y="691" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="719" font-family="sans-serif" font-size="11">gemini/anchored/safety (n=0)</text>
+<text x="618" y="719" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="747" font-family="sans-serif" font-size="11">qwen/direct/persona (n=0)</text>
+<text x="618" y="747" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="775" font-family="sans-serif" font-size="11">qwen/direct/empathy (n=0)</text>
+<text x="618" y="775" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="803" font-family="sans-serif" font-size="11">qwen/direct/quality (n=0)</text>
+<text x="618" y="803" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="831" font-family="sans-serif" font-size="11">qwen/direct/safety (n=0)</text>
+<text x="618" y="831" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="859" font-family="sans-serif" font-size="11">qwen/rationale/persona (n=0)</text>
+<text x="618" y="859" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="887" font-family="sans-serif" font-size="11">qwen/rationale/empathy (n=0)</text>
+<text x="618" y="887" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="915" font-family="sans-serif" font-size="11">qwen/rationale/quality (n=0)</text>
+<text x="618" y="915" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="943" font-family="sans-serif" font-size="11">qwen/rationale/safety (n=0)</text>
+<text x="618" y="943" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="971" font-family="sans-serif" font-size="11">qwen/anchored/persona (n=0)</text>
+<text x="618" y="971" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="999" font-family="sans-serif" font-size="11">qwen/anchored/empathy (n=0)</text>
+<text x="618" y="999" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="1027" font-family="sans-serif" font-size="11">qwen/anchored/quality (n=0)</text>
+<text x="618" y="1027" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+<text x="12" y="1055" font-family="sans-serif" font-size="11">qwen/anchored/safety (n=0)</text>
+<text x="618" y="1055" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>
+</svg>

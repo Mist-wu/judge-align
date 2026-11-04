@@ -1,0 +1,42 @@
+{
+  "observed_at": "2026-11-04T14:30:32.258809+00:00",
+  "controller": "Mac E4 agent; GPU handed to E2; server pi paused until root handoff",
+  "status": "awaiting_human",
+  "automated_status": "complete",
+  "completion_basis": "All 3000 scheduled requests have terminal outcomes. Preserve format failures; no more model requests.",
+  "providers": {
+    "deepseek": {
+      "executed_unique_requests": 1000,
+      "analyzable_outputs": 1000,
+      "strict_json_valid": 1000,
+      "syntax_recoveries": 0,
+      "remaining_format_invalid": 0,
+      "target": 1000,
+      "latest_result_at": "2026-11-04T13:48:30.176024+00:00"
+    },
+    "gemini": {
+      "executed_unique_requests": 1000,
+      "analyzable_outputs": 991,
+      "strict_json_valid": 991,
+      "syntax_recoveries": 0,
+      "remaining_format_invalid": 9,
+      "target": 1000,
+      "latest_result_at": "2026-11-04T13:49:54.165667+00:00"
+    },
+    "qwen": {
+      "executed_unique_requests": 1000,
+      "analyzable_outputs": 980,
+      "strict_json_valid": 979,
+      "syntax_recoveries": 1,
+      "remaining_format_invalid": 20,
+      "target": 1000,
+      "latest_result_at": "2026-11-04T14:28:53.961814+00:00"
+    }
+  },
+  "qwen_session": "exp-e24-recovery-a100",
+  "qwen_run_id": "E4-qwen-formal-003",
+  "qwen_remote_returncode": 1,
+  "merged_ledgers": "results/final-delivery",
+  "shared_runtime": "E2 now owns model use; root owns runtime release",
+  "next_command": "No more inference. Complete actual human annotations before human-dependent analysis."
+}

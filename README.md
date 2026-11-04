@@ -2,7 +2,7 @@
 
 三类 judge 与 CharacterEval 已公开共情评分的一致性有限；本次结果不足以支持用模型评分替代人工标注。
 
-逐条打分的 1,800 次原定请求已执行完毕，位置交换评测仍在运行；完整执行状态见 `HANDOFF.md` 和本机 `docs/formal-progress.json`。以下逐条打分结果来自真实输出，格式失败保持缺失。
+3,000 次原定请求已全部执行，2,970 条严格格式有效，加 1 条明确尾逗号恢复，共 2,971 条可分析；29 条格式失败保留缺失。自动阶段完成，状态为 `awaiting_human`，不再调用模型填补失败。Qwen 已退出，A100 于 23:29 交给 E2。完整记录见 `HANDOFF.md` 和 `docs/formal-progress.json`。
 
 | Judge | 写法 | 有效 N | 共情 QWK [95% CI] | Spearman [95% CI] |
 |---|---|---:|---:|---:|
@@ -24,6 +24,20 @@
 
 所有置信区间使用 1,000 次对话组 bootstrap。公开 reward-model 训练数据可能受基座模型污染，自定义共情锚点也并非原标注说明的逐字复制，因此不应把分歧直接解释为人工或模型一方必然错误。
 
+位置交换后的同一候选结论不一致率如下（含平局变化；不是人工正确率）：
+
+| Judge | 完整双向 N | 人设 | 共情 | 质量 | 安全 |
+|---|---:|---:|---:|---:|---:|
+| deepseek | 200 | 27.0% | 31.0% | 26.0% | 5.5% |
+| gemini | 192 | 9.9% | 25.0% | 8.3% | 0.0% |
+| qwen | 187 | 50.3% | 52.9% | 46.0% | 46.5% |
+
+原始首次格式有效率：DeepSeek 99.5%、Gemini 97.7%、Qwen 97.9%。API 额外尝试分别为 5 和 16 次，未删除失败账本；Qwen 没有重跑任何已有终态请求，仅恢复运行中丢失的 1 条。位置不一致率以各模型有效双向样本计算，分母不同、人工偏好缺失，不能直接解读为准确率排名；Gemini 安全维度只有 1 对双向非平局，零变化不能证明区分能力。完整区间和执行变更见报告。
+
+![实际统计图](figures/formal-comparison.png)
+
+已知 API 用量公开价估算 **$3.57763116**，另有 1 笔原始 DeepSeek 失败用量未知；Colab CU 单独记录，不把共享 GPU 重复计费。见 [成本记录](docs/cost.md)。最终合并原始账本在 `results/final-delivery/`；服务器原 API 账本保持原样。
+
 逐条解释见 [20 个分歧案例](docs/disagreement-analysis.md)，统计见 [正式报告](results/report.md)，开发集候选提示见 [selected-prompt.json](results/selected-prompt.json)。这些案例解释来自 Codex 分析，不是新人工标注。
 ## Prepare the full experiment
 
@@ -43,16 +57,16 @@ The source is pinned and downloaded under ignored `data/raw/`; source hashes are
 Supply `DEEPSEEK_API_KEY` and `GEMINI_API_KEY` through the environment, never CLI arguments or tracked files. Frozen defaults are `deepseek-flash` and `gemini-3.8-flash`; change `configs/main.json` only before a new run. These are independent from the Codex subscription used by the coding agent. API default URLs use official services. `model_env` is a fallback when `model` is removed from the provider configuration.
 
 ```bash
-# Run the full queues, reusing all successful records.
+# Fresh campaign example only. The delivered campaign is finished; do not rerun it.
 python3 scripts/run.py run --provider deepseek --output results/deepseek.jsonl
 python3 scripts/run.py run --provider gemini --output results/gemini.jsonl
 ```
 
 There are 600 pointwise and 400 paired-orientation requests per provider. Three pointwise styles are direct, concise rationale before score, and fixed rubric anchors. The fourth style is pairwise preference. All styles evaluate four dimensions in one request. No judge reads human ratings.
 
-DeepSeek output capacity is 8192 tokens; the first formal responses used 1536, which truncated reasoning-heavy replies. Complete earlier results are retained and failed requests are retried. Reports disclose the observed configuration hashes.
+DeepSeek output capacity is 8192 tokens; the first formal responses used 1536, which truncated reasoning-heavy replies. Complete earlier results were retained during that continuation; further format-invalid outputs are now retained as results and must not be regenerated merely to reach 100% validity. Reports disclose the observed configuration hashes.
 
-Gemini's original worker also uses 1536. After a real pairwise reply reached `MAX_TOKENS` with 1470 thinking tokens, the continuation configuration was raised to 8192 for missing requests only. The active original worker is not restarted; successful outputs remain unchanged. Repeated malformed pairwise JSON is resumed with `configs/gemini-pairwise-continuation.json`, which adds the official `responseJsonSchema` constraint for the already-required winners/reasons fields. It is used only with pairwise request subsets, keeps the original prompts and parses the whole JSON strictly. These format-control changes remain visible in raw configuration hashes and report metadata. See [Gemini structured output](https://aistudio.google.com/docs/structured-output).
+Gemini's original worker also uses 1536. After a real pairwise reply reached `MAX_TOKENS` with 1470 thinking tokens, the continuation configuration was raised to 8192 for missing requests only. Both original API workers have now ended; successful outputs remain unchanged. Repeated malformed pairwise JSON is resumed with `configs/gemini-pairwise-continuation.json`, which adds the official `responseJsonSchema` constraint for the already-required winners/reasons fields. It is used only with pairwise request subsets, keeps the original prompts and parses the whole JSON strictly. These format-control changes remain visible in raw configuration hashes and report metadata. See [Gemini structured output](https://aistudio.google.com/docs/structured-output).
 
 The runner uses an exclusive output-file lock. A request is durably recorded before submission, and successful `(request_id, requested_model)` pairs are skipped after restart, including after output-capacity adjustment. Each raw result retains its provider configuration hash. An interrupted request with unknown billing outcome requires investigation before explicitly adding `--retry-unknown`. Provider/auth/network errors stop this provider rather than spending across the remaining queue; malformed replies are recorded and fail the command. At most three recorded failed attempts per request.
 
@@ -73,9 +87,9 @@ Fill the blinded `data/human-template.jsonl` using `docs/rubric.md`; the four cu
 
 ```bash
 python3 scripts/run.py annotations --validate data/human-initial.jsonl
-python3 scripts/run.py report --judgments results/deepseek.jsonl results/gemini.jsonl results/qwen.jsonl
+python3 scripts/run.py report --judgments results/final-delivery/deepseek.jsonl results/final-delivery/gemini.jsonl results/final-delivery/qwen.jsonl
 # Add --human data/human-combined.jsonl only after genuine initial/retest annotation.
-python3 scripts/reconcile_cost.py
+python3 scripts/reconcile_cost.py --results results/final-delivery
 ```
 
 Outputs are `results/formal-summary.json`, `report.md`, `kappa.svg` and `disagreements.jsonl`. QWK and Spearman use exact paired samples with 1,000 conversation-group bootstrap resamples. Position bias uses both pair orientations. Length partial Spearman stays unavailable until independent human quality scores exist. Unknown/undefined values are `null` rather than fabricated zeros. Pairwise preference agreement is separate from ordinal QWK.

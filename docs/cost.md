@@ -1,6 +1,6 @@
 # E4 cost ledger
 
-The completed API campaign has a **known paid-list-price estimate of $3.57763116**, plus one original DeepSeek attempt with unknown usage. This is not an invoice; Gemini free-tier eligibility was not checked. Qwen's Colab compute units are separate. The reproducible calculation is `results/cost-summary.json`, generated at 2026-11-04 13:56:19 UTC from the merged raw ledgers.
+The completed API campaign has a **known paid-list-price estimate of $3.57763116**, plus one original DeepSeek attempt with unknown usage. This is not an invoice; Gemini free-tier eligibility was not checked. Qwen's Colab compute units are separate. The reproducible calculation is `results/final-delivery/cost-summary.json`, regenerated at 2026-11-04 14:30:47 UTC from the merged raw ledgers.
 
 | Provider / requested model | Unique scheduled requests executed | Terminal attempts | Failed attempts | Input tokens | Cached input tokens | Output tokens | Additional thinking tokens | Known estimate USD |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|

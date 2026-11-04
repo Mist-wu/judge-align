@@ -1,0 +1,20 @@
+{
+  "at": "2026-11-04T13:56:19.317265+00:00",
+  "operation": "Union raw original and retry ledgers by exact event content; preserve original failed responses and costs",
+  "providers": {
+    "gemini": {
+      "executed": 1000,
+      "analyzable": 991,
+      "invalid_remaining": 9,
+      "events": 2032,
+      "sha256": "997b1c2912f04f7909a5a44e1cecb8d7837de4e23aa7397366ed6624d6aeb944"
+    },
+    "deepseek": {
+      "executed": 1000,
+      "analyzable": 1000,
+      "invalid_remaining": 0,
+      "events": 2010,
+      "sha256": "e5741af6af296c87124f6ac1325c0352170be2d87812bce946a2362fa68312d0"
+    }
+  }
+}

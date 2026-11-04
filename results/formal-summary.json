@@ -1,0 +1,2195 @@
+{
+  "run_kind": "formal",
+  "created_at": "2026-11-04T14:29:55.850409+00:00",
+  "source_commit": "c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c",
+  "population": "CharacterEval released Empathy-annotated subset",
+  "primary_count": 200,
+  "pair_count": 200,
+  "bootstrap_unit": "Dialogue-prefix connected component across roles; all response variants and pair orientations remain together",
+  "successful_requests": 2971,
+  "expected_requests": 3000,
+  "attempted_requests": 3000,
+  "strict_json_successful_requests": 2970,
+  "format_recovered_requests": 1,
+  "format_outcomes": {
+    "deepseek": {
+      "first_attempt_successes": 995,
+      "first_attempt_failures": 5,
+      "terminal_inference_attempts": 1005,
+      "retry_attempts": 5,
+      "format_recoveries": 0
+    },
+    "gemini": {
+      "first_attempt_successes": 977,
+      "first_attempt_failures": 23,
+      "terminal_inference_attempts": 1016,
+      "retry_attempts": 16,
+      "format_recoveries": 0
+    },
+    "qwen": {
+      "first_attempt_successes": 979,
+      "first_attempt_failures": 21,
+      "terminal_inference_attempts": 1000,
+      "retry_attempts": 0,
+      "format_recoveries": 1
+    }
+  },
+  "failed_attempts": 51,
+  "failed_request_configs": 51,
+  "automated_status": "complete",
+  "completion_basis": "Every scheduled request has a terminal outcome; invalid model responses remain measured format failures, not fabricated scores.",
+  "human_pending": {
+    "persona": 200,
+    "empathy": 0,
+    "quality": 200,
+    "safety": 200
+  },
+  "pairwise_human_pending": {
+    "persona": 200,
+    "empathy": 200,
+    "quality": 200,
+    "safety": 200
+  },
+  "retest_pending": 50,
+  "pointwise": [
+    {
+      "provider": "deepseek",
+      "style": "direct",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "deepseek",
+      "style": "direct",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.18355855855855863,
+        "ci95": [
+          0.05989828706072031,
+          0.295669276674394
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.19907604288164482,
+        "ci95": [
+          0.06163664299243336,
+          0.3294221817980103
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "deepseek",
+      "style": "direct",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "deepseek",
+      "style": "direct",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "deepseek",
+      "style": "rationale",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "deepseek",
+      "style": "rationale",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.24975798644724112,
+        "ci95": [
+          0.11040031964466333,
+          0.3646922614999993
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.26180442512686825,
+        "ci95": [
+          0.11712984456527117,
+          0.3900119732050861
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "deepseek",
+      "style": "rationale",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "deepseek",
+      "style": "rationale",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "deepseek",
+      "style": "anchored",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "deepseek",
+      "style": "anchored",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.12722280334728042,
+        "ci95": [
+          0.006056252820187231,
+          0.2501091084444317
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.13541725064320342,
+        "ci95": [
+          -0.002070122388823896,
+          0.2710623139953468
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "deepseek",
+      "style": "anchored",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "deepseek",
+      "style": "anchored",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "direct",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "direct",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.18511685116851173,
+        "ci95": [
+          0.07086580209075485,
+          0.29890560443299474
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.20660184662676762,
+        "ci95": [
+          0.07281667650948109,
+          0.3329356604687443
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "gemini",
+      "style": "direct",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "direct",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "rationale",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "rationale",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.17465753424657526,
+        "ci95": [
+          0.07399414386450265,
+          0.27779974505581545
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.1999365847297316,
+        "ci95": [
+          0.06690306618229382,
+          0.3302226368417734
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "gemini",
+      "style": "rationale",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "rationale",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "anchored",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "anchored",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.1572632481074132,
+        "ci95": [
+          0.06028230942792233,
+          0.25771751830191486
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.16953946158341326,
+        "ci95": [
+          0.04214411006295958,
+          0.2868669451638046
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "gemini",
+      "style": "anchored",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "gemini",
+      "style": "anchored",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "direct",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "direct",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.09682520374650272,
+        "ci95": [
+          0.005319216573662638,
+          0.18706337332876874
+        ],
+        "n": 198,
+        "clusters": 175,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.13481049976152126,
+        "ci95": [
+          0.005236561168466964,
+          0.26035541985290445
+        ],
+        "n": 198,
+        "clusters": 175,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "qwen",
+      "style": "direct",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "direct",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "rationale",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "rationale",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.1402090209020901,
+        "ci95": [
+          0.02522322090864367,
+          0.2481390089101671
+        ],
+        "n": 196,
+        "clusters": 172,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.18453916938518813,
+        "ci95": [
+          0.043435707800765874,
+          0.31795722197188714
+        ],
+        "n": 196,
+        "clusters": 172,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "qwen",
+      "style": "rationale",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "rationale",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "anchored",
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "anchored",
+      "dimension": "empathy",
+      "qwk": {
+        "value": 0.12602524576813456,
+        "ci95": [
+          -0.010945285586226376,
+          0.2398726843519427
+        ],
+        "n": 199,
+        "clusters": 175,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.11376997706314322,
+        "ci95": [
+          -0.026550792032913755,
+          0.23872659305708246
+        ],
+        "n": 199,
+        "clusters": 175,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "measured"
+    },
+    {
+      "provider": "qwen",
+      "style": "anchored",
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    },
+    {
+      "provider": "qwen",
+      "style": "anchored",
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_partial_spearman": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      },
+      "length_definition": "Unicode character count; control = independently human-rated quality",
+      "status": "human_or_judgment_pending"
+    }
+  ],
+  "pairwise": [
+    {
+      "provider": "deepseek",
+      "dimension": "persona",
+      "position_inconsistency": {
+        "value": 0.27,
+        "ci95": [
+          0.20671713917525772,
+          0.3333333333333333
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.21195652173913043,
+        "ci95": [
+          0.1584555651423641,
+          0.2702702702702703
+        ],
+        "n": 184,
+        "clusters": 165,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "deepseek",
+      "dimension": "empathy",
+      "position_inconsistency": {
+        "value": 0.31,
+        "ci95": [
+          0.24749777110412463,
+          0.371298144212327
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.1640625,
+        "ci95": [
+          0.10523157894736841,
+          0.22767641035188974
+        ],
+        "n": 128,
+        "clusters": 112,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "deepseek",
+      "dimension": "quality",
+      "position_inconsistency": {
+        "value": 0.26,
+        "ci95": [
+          0.20207253886010362,
+          0.3202408987144058
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.24102564102564103,
+        "ci95": [
+          0.1871665705900849,
+          0.2990307486631016
+        ],
+        "n": 195,
+        "clusters": 175,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "deepseek",
+      "dimension": "safety",
+      "position_inconsistency": {
+        "value": 0.055,
+        "ci95": [
+          0.0240715579710145,
+          0.09092062759575449
+        ],
+        "n": 200,
+        "clusters": 176,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.14285714285714285,
+        "ci95": [
+          0.0,
+          0.3333333333333333
+        ],
+        "n": 7,
+        "clusters": 6,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "gemini",
+      "dimension": "persona",
+      "position_inconsistency": {
+        "value": 0.09895833333333333,
+        "ci95": [
+          0.06010112259444048,
+          0.14130577054404733
+        ],
+        "n": 192,
+        "clusters": 170,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.07567567567567568,
+        "ci95": [
+          0.041884816753926704,
+          0.11518324607329843
+        ],
+        "n": 185,
+        "clusters": 165,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "gemini",
+      "dimension": "empathy",
+      "position_inconsistency": {
+        "value": 0.25,
+        "ci95": [
+          0.1855528350515464,
+          0.3177201704545454
+        ],
+        "n": 192,
+        "clusters": 170,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.024691358024691357,
+        "ci95": [
+          0.0,
+          0.06493506493506493
+        ],
+        "n": 81,
+        "clusters": 76,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "gemini",
+      "dimension": "quality",
+      "position_inconsistency": {
+        "value": 0.08333333333333333,
+        "ci95": [
+          0.04712041884816754,
+          0.12367262423714036
+        ],
+        "n": 192,
+        "clusters": 170,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.06914893617021277,
+        "ci95": [
+          0.03723404255319149,
+          0.10582010582010581
+        ],
+        "n": 188,
+        "clusters": 169,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "gemini",
+      "dimension": "safety",
+      "position_inconsistency": {
+        "value": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "n": 192,
+        "clusters": 170,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.0,
+        "ci95": null,
+        "n": 1,
+        "clusters": 1,
+        "valid_resamples": 0
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "qwen",
+      "dimension": "persona",
+      "position_inconsistency": {
+        "value": 0.5026737967914439,
+        "ci95": [
+          0.4324289132882883,
+          0.5706528852720236
+        ],
+        "n": 187,
+        "clusters": 164,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.4794520547945205,
+        "ci95": [
+          0.39864746739746737,
+          0.5611633980486843
+        ],
+        "n": 146,
+        "clusters": 128,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "qwen",
+      "dimension": "empathy",
+      "position_inconsistency": {
+        "value": 0.5294117647058824,
+        "ci95": [
+          0.46485526510116676,
+          0.5989589942893402
+        ],
+        "n": 187,
+        "clusters": 164,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.6,
+        "ci95": [
+          0.4411764705882353,
+          0.7647058823529411
+        ],
+        "n": 35,
+        "clusters": 34,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "qwen",
+      "dimension": "quality",
+      "position_inconsistency": {
+        "value": 0.45989304812834225,
+        "ci95": [
+          0.39128109741920486,
+          0.5314376548307185
+        ],
+        "n": 187,
+        "clusters": 164,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.4382716049382716,
+        "ci95": [
+          0.3674547301632566,
+          0.5094339622641509
+        ],
+        "n": 162,
+        "clusters": 143,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "provider": "qwen",
+      "dimension": "safety",
+      "position_inconsistency": {
+        "value": 0.46524064171123,
+        "ci95": [
+          0.3999740932642487,
+          0.53371595387964
+        ],
+        "n": 187,
+        "clusters": 164,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "decisive_flip_rate": {
+        "value": 0.37755102040816324,
+        "ci95": [
+          0.2856766917293233,
+          0.47121710526315785
+        ],
+        "n": 98,
+        "clusters": 90,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "human_pair_accuracy": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    }
+  ],
+  "human_reliability": [
+    {
+      "dimension": "persona",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "dimension": "empathy",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "dimension": "quality",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    },
+    {
+      "dimension": "safety",
+      "qwk": {
+        "value": null,
+        "ci95": null,
+        "n": 0,
+        "clusters": 0,
+        "valid_resamples": 0
+      }
+    }
+  ],
+  "config_sha256": "82fcba1ed2e0e84be8d348409828c328513e7555fdf02bcc83ed070db3fa0522",
+  "data_sha256": "25d4e755d9c76e6163e5c9efca0e472ec649c195dbe6d019ec12beca482cb190",
+  "judgments_sha256": "965776db0f541ac03cab8d3e5c6374e4f924e37892fb6f62106a3007df4145b6",
+  "observed_provider_config_hashes": {
+    "deepseek": [
+      "c31d0e32ec95337becf8938f2bbf4a6ef929d47541f8b31bf1b41fd10d5a7db6",
+      "cfc79894ce37f07fa91d4c7c82876665997732607f73dd214f5c9a80054b2b43"
+    ],
+    "gemini": [
+      "0b9640bc07d8a041099f08168858790f003a35d9b8f34b24139b6c234b05a721",
+      "70c44749ca9eb5b20fa5dbcda6c1bae5876c3d6e54d537b305d88ae79c7b3e63",
+      "ed71a9e6a3c8d1e45393273692ce9d21c72e720b1f21a26dbea4be6a03dc6ec9"
+    ],
+    "qwen": [
+      "38202e5f47fa268515b9acf2071549a470564ec35dee060ab5ac517e475cf498",
+      "bda135d35cd10fbed5d5c59d98db32194a135cbcfa90850ba810c59fdf7cb5ee"
+    ]
+  },
+  "execution_changes": [
+    "deepseek output capacity increased from 1536 to 8192 after truncated reasoning responses; prior complete outputs are retained.",
+    "gemini output capacity increased from 1536 to 8192 after truncated reasoning responses; prior complete outputs are retained.",
+    "10 Gemini pairwise requests completed with an explicit JSON Schema after malformed JSON replies; prompts, candidate order and winner categories were unchanged.",
+    "1 Qwen outputs recovered by removing only trailing commas outside JSON strings. Original parse failures and billed usage remain recorded; no model was called and no score changed.",
+    "Qwen resumed 359 original requests in batches of at most 16 after the original Colab allocation disappeared. The first 641 terminal outcomes (including 9 format failures) were retained. Model revision, NF4 precision, prompts, greedy decoding and 1536-token output capacity were unchanged; left padding and per-row EOS accounting were added for batching. One prior in-flight request had no durable terminal outcome and was explicitly resumed; its lost token usage is unknown."
+  ],
+  "cost": {
+    "known_estimated_usd": 0,
+    "unknown_pricing_terminal_attempts": 3021,
+    "ambiguous_inflight_attempts": 1
+  },
+  "limitations": [
+    "Empathy-only source population; other custom dimensions require new human annotation.",
+    "Frozen custom empathy anchors differ from the upstream annotation examples; disagreement does not establish which judgment is correct.",
+    "Released reward-model training data are public and potentially contaminated.",
+    "Published candidate alternatives include Qwen/Baichuan; Qwen judge self-preference is a possible confound.",
+    "Length partial correlation controls observed human quality only; it is not causal.",
+    "Pairwise choices are not ordinal 1–5 scores and are not entered in the QWK heatmap.",
+    "Invalid JSON outputs are excluded from agreement metrics; format-related missingness may bias valid-sample estimates.",
+    "Human retest reliability is not a mathematical upper bound on judge agreement."
+  ],
+  "prompt_selection": {
+    "state": "complete",
+    "manifest": {
+      "method": "Connect contexts across roles when one is a prefix of the other; hash the minimum context_id in each group with E4-context-split-42:, lowest 20% of groups = development",
+      "fixed_at": "2026-11-04T13:19:53Z",
+      "timing": "Revised to remove 10 cross-split dialogue-prefix pairs after case inspection, before inspecting model/prompt aggregate rankings; not a preregistration.",
+      "overlap_audit": {
+        "same_role_prefix_pairs": 17,
+        "cross_role_prefix_pairs": 13,
+        "initial_cross_split_pairs": 10,
+        "final_cross_split_pairs": 0
+      },
+      "selection_rule": "Highest development Empathy QWK; lexicographic provider/style breaks ties.",
+      "case_split": {
+        "01959fdcdf6136e26906f051": "test",
+        "029f410bead428616cb82be5": "test",
+        "034adcf505381f3c60f2b814": "test",
+        "05d7cbe2fde837fedd39904d": "development",
+        "05d7de25d0fcbf010348a704": "test",
+        "078e0f5ec668e273c7281207": "test",
+        "07cc089ebdb0876f876e7064": "test",
+        "0c63998aa7b0930c25926875": "development",
+        "0d943823d173948b284f4fe1": "test",
+        "0f0bf37b3dabc17e10f5521c": "test",
+        "0f6344afddff825851eb9349": "test",
+        "109b94a377aaf8d599f699c7": "test",
+        "10cc9d747bdd4d3b476794dc": "test",
+        "122ef9db168fb12fc0c806ae": "development",
+        "12754a4ada8d9206ab019f7c": "development",
+        "1337d9b6fcbf444c9ec2930e": "test",
+        "158641952086755ec8996c52": "test",
+        "188b120d5cd227e3567567be": "test",
+        "1910f6ab16a050dfe9ec18b1": "development",
+        "1a7903589f73e2e9022c7464": "test",
+        "1b7fa2ab6b399dc4369321d3": "development",
+        "1cd3e9674c403f0cf0445b94": "test",
+        "1cf7ff5a28ae755e5b822d87": "test",
+        "1d42f2a10d05a987ecf97df0": "test",
+        "2047060a305f2289c11caa83": "test",
+        "210c0dba2890aad06c777a8b": "test",
+        "2340b2e4ad8098e3c1edaf4f": "test",
+        "237c852f5f3a18262e5c4490": "test",
+        "24d010f050c63633297c6c0d": "test",
+        "24d5164fd30054f36ec8dc4d": "development",
+        "250cc118e4c7f16a48d57a64": "test",
+        "25caf2e96ded039234414df6": "test",
+        "278efca81e92e7323c103a4d": "test",
+        "287c5ff88f96f27a73fb0dbe": "test",
+        "29d50a069ede5b9123315603": "development",
+        "2a6d8a936f5a1374646edf24": "development",
+        "2af566348bd1aa2fcfbb7d24": "test",
+        "2b040da6ae1009bb4fc2dfa7": "development",
+        "2bbc95757444c678d76117b2": "test",
+        "2e794e78294f2c76199bf10e": "development",
+        "2eb1020eb033ac26b0a63d2d": "test",
+        "2ebec19cb83170e6824a10a5": "test",
+        "30a7d11f174cc8cb73f35a08": "test",
+        "347807af6ab3e37c8702753e": "test",
+        "349d217461263927603e089d": "test",
+        "35ddf2aa3288db7b9dc97208": "development",
+        "3a87ce3eee23d5a9a1383da1": "test",
+        "3b14482a7e41cdb4a8c0a8a8": "test",
+        "3b3a5e87324e27bce460797f": "test",
+        "3bb6fe4ab25a7f49f9f4692b": "test",
+        "3d427cd95e32fcbe5b1aafb0": "test",
+        "3ddca62a75164aab12e447b8": "test",
+        "3e1294733eea3f183877ffba": "development",
+        "3e7fb5627145e92463a17d36": "test",
+        "405453747a758fb3eb96825d": "test",
+        "407dd23ff066eaa74cf93f1d": "test",
+        "428228cb68ff56745e7c02fe": "test",
+        "45b73e060148f0e7a45a064a": "test",
+        "482fa1ec159ce63714cd59f6": "test",
+        "4ad33d3f15ba9760f9a7db84": "test",
+        "4ad7b0b3f1731829abccc5b2": "test",
+        "4ada167d69f3ae9c92739e60": "development",
+        "4d8d4420529edac413d7dce0": "development",
+        "4e0ff9490859ea2763130915": "test",
+        "4e8e8dfc2a3fc21c788988d6": "test",
+        "4f44da891ef75dabcb8c7907": "test",
+        "50ca4a03c38b885af8c2355e": "test",
+        "52206d72ee52fa9ac288de60": "test",
+        "526d4d9b5cfd74cc09db4849": "test",
+        "53bd05cdb164c239ee7cdf85": "test",
+        "55d9914f483261d73a973d5e": "test",
+        "561de994bb8cfc97665f0ad3": "test",
+        "562dd36f8f55752ab7c3f0ae": "test",
+        "57c2f72126884228a519d1f2": "test",
+        "5971892f80bf4817f9be66b1": "test",
+        "59b8f45de144a15d91badb75": "test",
+        "5d554c8ed2de9d8cafa4bf55": "test",
+        "5d643c9b432d3e949af6a097": "test",
+        "5ec00e6ac23116e9e2bcb64b": "test",
+        "607e6c175a6ea96a7342077c": "test",
+        "609c4ae73dd2cf6c75f4b6ad": "test",
+        "62830ce6f36a6721ae5b030f": "test",
+        "628cfc5e9bb2aac87ab4ac21": "development",
+        "629eb3897612a4f910612406": "test",
+        "63920fc9dd31f605272fc3f1": "development",
+        "63d2e238bd593d87efac0b7a": "test",
+        "6409f97565cab25a54d76228": "test",
+        "6510bf3d62da61ae473b9654": "development",
+        "663c345fd1c893e95da27dca": "test",
+        "667445db9f8b9cb11b27d5d2": "test",
+        "6a6e41fcadb215e95f5cee5c": "test",
+        "6d34020af44e41d6828a31d6": "test",
+        "6d9883138fea579a7f50968d": "development",
+        "6efc7e56a4bbe7fd455ae14a": "test",
+        "749ab4e73c4dceb25dbf1287": "test",
+        "77ade7f748eb52b604ea58fe": "test",
+        "783b59217febde7f367dc9ca": "test",
+        "783ca037795fc62a3668ee79": "test",
+        "7b6ddf102b1186c200d4f4bb": "test",
+        "7ba39ad86702d4d162b8f36b": "test",
+        "7df447447629a731ac8a055a": "test",
+        "7e7c0c2926ca06355cc7eab1": "test",
+        "8127e5ae38e588312eaa547b": "test",
+        "82ce00bdfa372a00b55314d2": "development",
+        "848ad0715952757bf46341c3": "development",
+        "84f7e85ea00a52cfaa93aced": "test",
+        "884a0974f262eb1bc6532c12": "test",
+        "89501250f57cd14f48cfcf9f": "test",
+        "89d1b9adc733ca9e6a231acb": "test",
+        "8c7bf821bc1b0cc286ac5564": "test",
+        "900cf13e04176a012cf6d4d1": "test",
+        "9077c0c5eb98def47e42884a": "test",
+        "919190309222d949f90388d1": "test",
+        "91b35b8e72b7294d477171d2": "test",
+        "9218cac3b8aaf3caed962f34": "test",
+        "922d34562638c2a18f9a00c4": "test",
+        "94b7de0cd39a683f61cc6e25": "test",
+        "988cd3a17e2c3b2dc18f547c": "test",
+        "98f3c6fa2a5f718680170370": "development",
+        "997824eab0c6cb0dfafa8194": "development",
+        "a0613417ae68b8cbcf00fd42": "test",
+        "a0e46918f7766559eaefc36c": "test",
+        "a126471434ddb4acd28a6661": "test",
+        "a325c020b715fb22c8f02809": "development",
+        "a33136aa35104b30d2c6444e": "test",
+        "a5ce25b39608038e34d8543b": "test",
+        "a91eff882a0fc54c6c2b884f": "test",
+        "a92ad6e267ad524c0cbc65e0": "test",
+        "a9ab24e062eeeb7c2c39924d": "test",
+        "a9c3fd4321377366a94fd85e": "test",
+        "ab8c17aa1ecfa48828786448": "test",
+        "abbdda6e720f480e9ab9ff94": "test",
+        "ad7ed574a9f28af3efc79ad1": "development",
+        "b03ab0457974d18d24dcf41c": "test",
+        "b3a2ae2cad756289d3c057df": "test",
+        "b44f9eaf88ba864f3f12805b": "test",
+        "b5211461c135234f8242430c": "test",
+        "b65bf3ce94256976841daf43": "development",
+        "b719a03883b1a631526f70fb": "test",
+        "b8a908216780861bf69fef9d": "test",
+        "b93ffb065141c321dc291bdf": "test",
+        "bb6a4a58c7f8cfe6cc15717b": "test",
+        "bc240e939d7ea8dfe074269f": "test",
+        "bc2633e6cdaa7cdc99578462": "test",
+        "bf23371514e3a4410f7ef594": "test",
+        "bf335760c5e367f1b264980b": "test",
+        "c06a02d4c30b7ed8ed7334cc": "development",
+        "c16e54bb702bc0e4472a4365": "test",
+        "c8802672adb353ef42d00caf": "test",
+        "ca506a707a92b4b0fb8e06a3": "test",
+        "ca5dc89e5ebce28effc65b8b": "development",
+        "cdb6665ae7b137989de962ef": "development",
+        "cec5405f22320e51b187178b": "test",
+        "cf0ef71d19db55b34b40986f": "development",
+        "d013dfd784b9db894520c4af": "test",
+        "d150cddd6c6c7c05f13acde2": "test",
+        "d190eeb0f56e7e47689f5f6c": "test",
+        "d380506b213cd0d309c03ec7": "test",
+        "d3d5feecd971fc34ac4e5b2c": "test",
+        "d549ab531047dd2d4e40d356": "test",
+        "d56ca2cc652789a180628ac5": "test",
+        "d6401c128bdae498ccf7f54f": "test",
+        "d665b425b885dc413c1670f5": "test",
+        "d7e50ba6b7df07e8e0c7c237": "test",
+        "d9a18dd7cd3b11b523223550": "development",
+        "da0b996e4bc161df50437210": "test",
+        "daa93d64787a9550d9ff9119": "test",
+        "dac2535288a65cbe6d1e6f49": "test",
+        "db1fb7b315a104fb1482555d": "test",
+        "dc58a34bfc83f68f8f2d9dcc": "test",
+        "dc6bbbd9e9dfa9b5eb231195": "test",
+        "e1d460ddc9ca53f17909c1ea": "test",
+        "e28142ff92550e23ae41d7ac": "test",
+        "e2fda90fafc55473f0ab7056": "test",
+        "e6acfecca72bd3b5b28ae61a": "test",
+        "e72078fab3f60eba4fe174b0": "test",
+        "e856b53dcb0dbf121ba3ce54": "test",
+        "eab0261ee2ea3a2d70f28ca9": "test",
+        "eae7fde69a09fe15a70b4b8f": "test",
+        "eb3d3df670fd783f22eaf017": "test",
+        "eb9b53dc7c1422e1434ff183": "test",
+        "ef60b3c63fb397601cc5d04e": "test",
+        "f1a0ea98c2ffdce142d5518c": "development",
+        "f3fb8ddbe4f33ded9ce42c6e": "test",
+        "f43c1fa115ffcbeb9421bdf4": "development",
+        "f458a565f7e4cd50f21de66f": "test",
+        "f5365f9264c8c5abf7c742d0": "test",
+        "f5b22a699e74e2f3e74ae370": "development",
+        "f761c03afea4045143cf6b1d": "test",
+        "f80eb874e7dd399daf4ea71b": "development",
+        "f811feeb97b8219586cc0a57": "development",
+        "faf9225d3e59e3225923bfb2": "test",
+        "fb6ff2927732d6749348f696": "test",
+        "fbc199fdd3d1306184615a00": "test",
+        "fbdb5fb38f9be1ce119ded73": "test",
+        "fcce0d6755e85aaaf2aa9cfa": "development",
+        "fdc462c988c3598824a219bc": "development",
+        "fe1fdbfd8a7e5c905f6d60f7": "test",
+        "feb1d1c1d0f6bd39a5eb0709": "test",
+        "ff978ef32de8774ff259610f": "development"
+      },
+      "context_counts": {
+        "development": 35,
+        "test": 141
+      },
+      "conversation_group_by_case": {
+        "01959fdcdf6136e26906f051": "095b46a7cbc4191649c00d09",
+        "029f410bead428616cb82be5": "066816dcb8df7eb1ab86ffb0",
+        "034adcf505381f3c60f2b814": "973e45f5a535a22c4868982f",
+        "05d7cbe2fde837fedd39904d": "65a2eee576914d49a58d5bbc",
+        "05d7de25d0fcbf010348a704": "467a1d8f1ecf22b0def880d1",
+        "078e0f5ec668e273c7281207": "78af7b95fb54c7822ca69a44",
+        "07cc089ebdb0876f876e7064": "2a6c02647a538b152fe287d8",
+        "0c63998aa7b0930c25926875": "c6330a8860ea0e3e9054accd",
+        "0d943823d173948b284f4fe1": "6747e41dce71ec6bccab43ee",
+        "0f0bf37b3dabc17e10f5521c": "0a0aae3f7bc6d2139fda0839",
+        "0f6344afddff825851eb9349": "1fe2839e81b9a5d6d1a14716",
+        "109b94a377aaf8d599f699c7": "1a520aedd3fad4659247dd54",
+        "10cc9d747bdd4d3b476794dc": "20abc99c0b4b38e14752a46b",
+        "122ef9db168fb12fc0c806ae": "34c165ddbf8bc4d1672f7990",
+        "12754a4ada8d9206ab019f7c": "937bda6d91555dc3c86d7fd9",
+        "1337d9b6fcbf444c9ec2930e": "467a1d8f1ecf22b0def880d1",
+        "158641952086755ec8996c52": "dae3c5658eaf9f50d29e91cd",
+        "188b120d5cd227e3567567be": "6eb3c41ff944472b93b0016d",
+        "1910f6ab16a050dfe9ec18b1": "274fbe598a5d221fb8af8a94",
+        "1a7903589f73e2e9022c7464": "1c1e1460d31abc585bfcab90",
+        "1b7fa2ab6b399dc4369321d3": "6dbf19aa642847532c0a1036",
+        "1cd3e9674c403f0cf0445b94": "33c66a325e90f12f6b413f54",
+        "1cf7ff5a28ae755e5b822d87": "cccba4cc50acdc746ab585a9",
+        "1d42f2a10d05a987ecf97df0": "3d4291a795421ab9f10c7520",
+        "2047060a305f2289c11caa83": "3d922994251580b118b42fc3",
+        "210c0dba2890aad06c777a8b": "0f9c108761b84667bf94e710",
+        "2340b2e4ad8098e3c1edaf4f": "8c43ee5d8b5ac4adf16fca50",
+        "237c852f5f3a18262e5c4490": "adea2aff9d33d47ddbbb56ca",
+        "24d010f050c63633297c6c0d": "ed435ec50a77c8df72dbddb3",
+        "24d5164fd30054f36ec8dc4d": "6dbf19aa642847532c0a1036",
+        "250cc118e4c7f16a48d57a64": "218d0359d487e10ba9b6392f",
+        "25caf2e96ded039234414df6": "36e4d57f9fca4fc4859b60d6",
+        "278efca81e92e7323c103a4d": "6ee670e97f9b17d305ea0d27",
+        "287c5ff88f96f27a73fb0dbe": "612bfaa10b8b4ad3d88244c1",
+        "29d50a069ede5b9123315603": "4cbbce81f9d7133335ee16d6",
+        "2a6d8a936f5a1374646edf24": "48909b92375bf225d12259f2",
+        "2af566348bd1aa2fcfbb7d24": "973e45f5a535a22c4868982f",
+        "2b040da6ae1009bb4fc2dfa7": "cfaef42b45a9133af3a15f0b",
+        "2bbc95757444c678d76117b2": "1fe2839e81b9a5d6d1a14716",
+        "2e794e78294f2c76199bf10e": "b1ef2640e7439b53f42cd73c",
+        "2eb1020eb033ac26b0a63d2d": "7339e0fccb5064e8389eb8f1",
+        "2ebec19cb83170e6824a10a5": "b13fd29051fa229da12b1c02",
+        "30a7d11f174cc8cb73f35a08": "f64e2fe1b1e99ac8737fca9c",
+        "347807af6ab3e37c8702753e": "42c056324d163ef64b44478c",
+        "349d217461263927603e089d": "a9696e44ffdd5bcfa9d1fad6",
+        "35ddf2aa3288db7b9dc97208": "30732133f8bf47cb6605ce97",
+        "3a87ce3eee23d5a9a1383da1": "398ec460f6843a8d51f809b9",
+        "3b14482a7e41cdb4a8c0a8a8": "2bc6b161e334507418013ef1",
+        "3b3a5e87324e27bce460797f": "527628ec9ab008eece03c419",
+        "3bb6fe4ab25a7f49f9f4692b": "dae3c5658eaf9f50d29e91cd",
+        "3d427cd95e32fcbe5b1aafb0": "39984da0b73ad1d44c1f3a2e",
+        "3ddca62a75164aab12e447b8": "badc87447ac4561e50aec77d",
+        "3e1294733eea3f183877ffba": "8739d413514179dccfac1f08",
+        "3e7fb5627145e92463a17d36": "1fe2839e81b9a5d6d1a14716",
+        "405453747a758fb3eb96825d": "2a5e38f2fea085010a79a7ab",
+        "407dd23ff066eaa74cf93f1d": "6e0a31c5351b3120218f40c9",
+        "428228cb68ff56745e7c02fe": "c6506cf70f55b21ec3086ca7",
+        "45b73e060148f0e7a45a064a": "9ae553bedd9ca9bf4833ace4",
+        "482fa1ec159ce63714cd59f6": "823ab74559f5285d2893af93",
+        "4ad33d3f15ba9760f9a7db84": "528feb38fa55ce48ebe992d1",
+        "4ad7b0b3f1731829abccc5b2": "6eb3c41ff944472b93b0016d",
+        "4ada167d69f3ae9c92739e60": "3557a50bfbd042eabbc21a4e",
+        "4d8d4420529edac413d7dce0": "3a75501db722fa5e9e348cb1",
+        "4e0ff9490859ea2763130915": "2439a3ad0bc6b813b9a52147",
+        "4e8e8dfc2a3fc21c788988d6": "218d0359d487e10ba9b6392f",
+        "4f44da891ef75dabcb8c7907": "ca12b85271498cdca23e6f5f",
+        "50ca4a03c38b885af8c2355e": "654e6e8709fadfc3964e3468",
+        "52206d72ee52fa9ac288de60": "cc042c9ee8d9129d521585fd",
+        "526d4d9b5cfd74cc09db4849": "ed0c60241eee82079e14ad53",
+        "53bd05cdb164c239ee7cdf85": "2f712a711c306b7a34d2a2e5",
+        "55d9914f483261d73a973d5e": "e1a11bb3cb5357b9e70c94ea",
+        "561de994bb8cfc97665f0ad3": "98e64d0658c539f87bcbec09",
+        "562dd36f8f55752ab7c3f0ae": "83eb12a9fb96cd3df14777b9",
+        "57c2f72126884228a519d1f2": "c555b589e6be5fddd4b74557",
+        "5971892f80bf4817f9be66b1": "7b9d32b6df9a6f57b61467b1",
+        "59b8f45de144a15d91badb75": "8387ac428220560b9df11f4f",
+        "5d554c8ed2de9d8cafa4bf55": "af9b36be515990b5ca029522",
+        "5d643c9b432d3e949af6a097": "c038d00496b9993fc50ff94f",
+        "5ec00e6ac23116e9e2bcb64b": "1857a174ae96f5060bd8fc6d",
+        "607e6c175a6ea96a7342077c": "8b933f3166d5916cbb356ea3",
+        "609c4ae73dd2cf6c75f4b6ad": "ee96cae8be351470ceda6b62",
+        "62830ce6f36a6721ae5b030f": "c6f9418aba6fb6b74da277c1",
+        "628cfc5e9bb2aac87ab4ac21": "2d780fdce845cfbacf24ff22",
+        "629eb3897612a4f910612406": "8103733b76a1120c00bef2f0",
+        "63920fc9dd31f605272fc3f1": "1c32bfb529a10c9823db271f",
+        "63d2e238bd593d87efac0b7a": "193a43725ab7dac3459dac81",
+        "6409f97565cab25a54d76228": "d2f39620e61fea2de86d421e",
+        "6510bf3d62da61ae473b9654": "82237bd5fd2075150a153bd8",
+        "663c345fd1c893e95da27dca": "174a49c19977231d7768cebc",
+        "667445db9f8b9cb11b27d5d2": "599e091c3f7999fcc0f26b36",
+        "6a6e41fcadb215e95f5cee5c": "812684d3b635248be613d346",
+        "6d34020af44e41d6828a31d6": "fb1fd02183a5859508887af2",
+        "6d9883138fea579a7f50968d": "7ff7f1b60394cae63f33dcae",
+        "6efc7e56a4bbe7fd455ae14a": "4f9fd02822199d502393c824",
+        "749ab4e73c4dceb25dbf1287": "15c92524892854f97de920a7",
+        "77ade7f748eb52b604ea58fe": "9824d4ff720c1ac22a5cd159",
+        "783b59217febde7f367dc9ca": "066816dcb8df7eb1ab86ffb0",
+        "783ca037795fc62a3668ee79": "325139e76c5434732c7b969b",
+        "7b6ddf102b1186c200d4f4bb": "90374bd40b1b0e89aba1d2f5",
+        "7ba39ad86702d4d162b8f36b": "a0bc38373dc2894ec488870a",
+        "7df447447629a731ac8a055a": "32b4e0face3ac9dc0289a152",
+        "7e7c0c2926ca06355cc7eab1": "f1d387580fd1be1ca23a3e97",
+        "8127e5ae38e588312eaa547b": "62a5cc08449b8101f0b53140",
+        "82ce00bdfa372a00b55314d2": "523cb2fce4e66b18861f118f",
+        "848ad0715952757bf46341c3": "da26aa7da25c4847b3874da8",
+        "84f7e85ea00a52cfaa93aced": "9a667cad8a31e06fc25c4d5f",
+        "884a0974f262eb1bc6532c12": "fa0ed513c14cdf833987ef9c",
+        "89501250f57cd14f48cfcf9f": "3710f25f0f4d7dff64d39f00",
+        "89d1b9adc733ca9e6a231acb": "38864bff8de6ec7cbb82c625",
+        "8c7bf821bc1b0cc286ac5564": "342248f3ae5173ba197dde64",
+        "900cf13e04176a012cf6d4d1": "798dd9037037af27da7b3654",
+        "9077c0c5eb98def47e42884a": "f02b20054281fdd14695862b",
+        "919190309222d949f90388d1": "ac3239805ddee6e6425ede5f",
+        "91b35b8e72b7294d477171d2": "8b88281be1330634d666363c",
+        "9218cac3b8aaf3caed962f34": "b241fc7e0fa8615d181965a6",
+        "922d34562638c2a18f9a00c4": "823ab74559f5285d2893af93",
+        "94b7de0cd39a683f61cc6e25": "c4f88eedb5f19479cb520981",
+        "988cd3a17e2c3b2dc18f547c": "5fc0f124c1f0966438ec3e1e",
+        "98f3c6fa2a5f718680170370": "2b50e84b34ce58179e7cb43e",
+        "997824eab0c6cb0dfafa8194": "8e6bb4eede7a0598ee675a45",
+        "a0613417ae68b8cbcf00fd42": "6eaf46c6e62c6362e4061999",
+        "a0e46918f7766559eaefc36c": "08ec85294b4489cd365e6d0c",
+        "a126471434ddb4acd28a6661": "b51e92ce956f5fdc08787810",
+        "a325c020b715fb22c8f02809": "d594271c1b6a35bdbee19159",
+        "a33136aa35104b30d2c6444e": "aa64d4644b94472716fdc0be",
+        "a5ce25b39608038e34d8543b": "3da4950c553be130be6cdb53",
+        "a91eff882a0fc54c6c2b884f": "0df8217ee10fc3d851d3d9b9",
+        "a92ad6e267ad524c0cbc65e0": "973e45f5a535a22c4868982f",
+        "a9ab24e062eeeb7c2c39924d": "42c056324d163ef64b44478c",
+        "a9c3fd4321377366a94fd85e": "1fe2839e81b9a5d6d1a14716",
+        "ab8c17aa1ecfa48828786448": "04e905a8a814350ec6532f0d",
+        "abbdda6e720f480e9ab9ff94": "f1f1a33196e7c667754c0cb2",
+        "ad7ed574a9f28af3efc79ad1": "e69c645692fb8781430a2d41",
+        "b03ab0457974d18d24dcf41c": "3d922994251580b118b42fc3",
+        "b3a2ae2cad756289d3c057df": "08ec85294b4489cd365e6d0c",
+        "b44f9eaf88ba864f3f12805b": "945205e05892fc80374e7e68",
+        "b5211461c135234f8242430c": "1378747411aaea7d4935d55c",
+        "b65bf3ce94256976841daf43": "2b164f95f0d0cd8403823cf5",
+        "b719a03883b1a631526f70fb": "c30f49b319309906ad6a790b",
+        "b8a908216780861bf69fef9d": "d006b17e9235ff9c8b38d596",
+        "b93ffb065141c321dc291bdf": "51c90c66e213074dc7c6572a",
+        "bb6a4a58c7f8cfe6cc15717b": "0455ccd27aed03e698df29e3",
+        "bc240e939d7ea8dfe074269f": "ff08070fabd49c334cdf6d03",
+        "bc2633e6cdaa7cdc99578462": "bdca96f7d593373fba109f4d",
+        "bf23371514e3a4410f7ef594": "8103733b76a1120c00bef2f0",
+        "bf335760c5e367f1b264980b": "025c352d629561650268a312",
+        "c06a02d4c30b7ed8ed7334cc": "2b50e84b34ce58179e7cb43e",
+        "c16e54bb702bc0e4472a4365": "905e02a290d6a696596092f3",
+        "c8802672adb353ef42d00caf": "752aa5bfde59f99820fdb70f",
+        "ca506a707a92b4b0fb8e06a3": "13ccebf3928bcd01c9884a24",
+        "ca5dc89e5ebce28effc65b8b": "d5a802423d7f469b7b3e1ad4",
+        "cdb6665ae7b137989de962ef": "e599885ea29f079d1f905494",
+        "cec5405f22320e51b187178b": "c0c8bfbe1ef44c8499483a7f",
+        "cf0ef71d19db55b34b40986f": "bdcfb8f4e298d56c5288e761",
+        "d013dfd784b9db894520c4af": "eb7ad18993ae3b62ba8c0859",
+        "d150cddd6c6c7c05f13acde2": "10c5dd817a40caa33af8a5f7",
+        "d190eeb0f56e7e47689f5f6c": "f4caf113b3a5088bd50cdbe8",
+        "d380506b213cd0d309c03ec7": "3d922994251580b118b42fc3",
+        "d3d5feecd971fc34ac4e5b2c": "16c0fd2af5d5508b413f693c",
+        "d549ab531047dd2d4e40d356": "6fc1a9bb45ba695a034d6deb",
+        "d56ca2cc652789a180628ac5": "98cd0ca1bc07be0ed5dbabb6",
+        "d6401c128bdae498ccf7f54f": "39c1678cb23b68164e88ced5",
+        "d665b425b885dc413c1670f5": "04e905a8a814350ec6532f0d",
+        "d7e50ba6b7df07e8e0c7c237": "5529dfdaf0a4ef6ad601c6ed",
+        "d9a18dd7cd3b11b523223550": "6fc3f2b143db758d384bbc6a",
+        "da0b996e4bc161df50437210": "688deb5ec02e55ccf6d7ce13",
+        "daa93d64787a9550d9ff9119": "e2a02354f0e5f7c2e11ffaa7",
+        "dac2535288a65cbe6d1e6f49": "8a4768bb8b134c47b80e8add",
+        "db1fb7b315a104fb1482555d": "612bfaa10b8b4ad3d88244c1",
+        "dc58a34bfc83f68f8f2d9dcc": "d1c497a923a30b3fb04e91e4",
+        "dc6bbbd9e9dfa9b5eb231195": "1d5149fbcb4279e99142dd00",
+        "e1d460ddc9ca53f17909c1ea": "90b022cf6fd6a51dcde7f73f",
+        "e28142ff92550e23ae41d7ac": "688ae4e54ff61b62999e3731",
+        "e2fda90fafc55473f0ab7056": "7f993a0915ba76b64c163745",
+        "e6acfecca72bd3b5b28ae61a": "253651c15b5278bba26baf30",
+        "e72078fab3f60eba4fe174b0": "d52853c09f25c6cf0c69ed8a",
+        "e856b53dcb0dbf121ba3ce54": "d29052de543262b9b7b50e7b",
+        "eab0261ee2ea3a2d70f28ca9": "ad253c41cb4ce8bdec074dc3",
+        "eae7fde69a09fe15a70b4b8f": "7cf3a5f89bbb4ee7365f8dcc",
+        "eb3d3df670fd783f22eaf017": "3ccd470fa3498d7c39e504e5",
+        "eb9b53dc7c1422e1434ff183": "5094e6a1d3832ef7c37c2d41",
+        "ef60b3c63fb397601cc5d04e": "f8fea834f11ca808c13eea91",
+        "f1a0ea98c2ffdce142d5518c": "68b0da1c87040bb110ff066b",
+        "f3fb8ddbe4f33ded9ce42c6e": "258f58c82160e8db3f6e052a",
+        "f43c1fa115ffcbeb9421bdf4": "d8ed473751f16ae1e666f9bf",
+        "f458a565f7e4cd50f21de66f": "752aa5bfde59f99820fdb70f",
+        "f5365f9264c8c5abf7c742d0": "fb28d8271866b40c452c32ad",
+        "f5b22a699e74e2f3e74ae370": "4febe176d4d15082acf503dc",
+        "f761c03afea4045143cf6b1d": "6a59dd19697d7a0494b277e3",
+        "f80eb874e7dd399daf4ea71b": "8e6bb4eede7a0598ee675a45",
+        "f811feeb97b8219586cc0a57": "f3ea5653372feb8543463ef4",
+        "faf9225d3e59e3225923bfb2": "e98793e20b194d2cd8093780",
+        "fb6ff2927732d6749348f696": "2a474beef095da212055d733",
+        "fbc199fdd3d1306184615a00": "bd68eaf3e32885ed3ae78a66",
+        "fbdb5fb38f9be1ce119ded73": "e2a02354f0e5f7c2e11ffaa7",
+        "fcce0d6755e85aaaf2aa9cfa": "984968944f0a6357d9be5c82",
+        "fdc462c988c3598824a219bc": "8e6bb4eede7a0598ee675a45",
+        "fe1fdbfd8a7e5c905f6d60f7": "9125eb222bfa74aee3c7dfec",
+        "feb1d1c1d0f6bd39a5eb0709": "0e98b7e2655951666e61392e",
+        "ff978ef32de8774ff259610f": "8732e17163027d368b829758"
+      },
+      "case_counts": {
+        "development": 39,
+        "test": 161
+      },
+      "source_empathy_distribution": {
+        "development": {
+          "1": 2,
+          "2": 12,
+          "3": 19,
+          "4": 6
+        },
+        "test": {
+          "1": 13,
+          "2": 41,
+          "3": 43,
+          "4": 55,
+          "5": 9
+        }
+      }
+    },
+    "development": [
+      {
+        "provider": "deepseek",
+        "style": "direct",
+        "n": 36,
+        "qwk": -0.23825503355704702
+      },
+      {
+        "provider": "deepseek",
+        "style": "rationale",
+        "n": 36,
+        "qwk": -0.19822485207100593
+      },
+      {
+        "provider": "deepseek",
+        "style": "anchored",
+        "n": 36,
+        "qwk": -0.26537785588752194
+      },
+      {
+        "provider": "gemini",
+        "style": "direct",
+        "n": 36,
+        "qwk": -0.16442048517520225
+      },
+      {
+        "provider": "gemini",
+        "style": "rationale",
+        "n": 36,
+        "qwk": -0.15884476534296033
+      },
+      {
+        "provider": "gemini",
+        "style": "anchored",
+        "n": 36,
+        "qwk": -0.15243902439024382
+      },
+      {
+        "provider": "qwen",
+        "style": "direct",
+        "n": 36,
+        "qwk": -0.012499999999999956
+      },
+      {
+        "provider": "qwen",
+        "style": "rationale",
+        "n": 36,
+        "qwk": 0.06106870229007644
+      },
+      {
+        "provider": "qwen",
+        "style": "anchored",
+        "n": 36,
+        "qwk": 0.06319702602230481
+      }
+    ],
+    "common_valid_case_count": 193,
+    "excluded_cases_for_incomplete_judgments": [
+      "a325c020b715fb22c8f02809",
+      "b03ab0457974d18d24dcf41c",
+      "b65bf3ce94256976841daf43",
+      "b93ffb065141c321dc291bdf",
+      "dac2535288a65cbe6d1e6f49",
+      "e2fda90fafc55473f0ab7056",
+      "f1a0ea98c2ffdce142d5518c"
+    ],
+    "selected": {
+      "provider": "qwen",
+      "style": "anchored",
+      "n": 36,
+      "qwk": 0.06319702602230481
+    },
+    "held_out_test": {
+      "qwk": {
+        "value": 0.12509014620074732,
+        "ci95": [
+          -0.016067001461246483,
+          0.2533482784578611
+        ],
+        "n": 157,
+        "clusters": 138,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      },
+      "spearman": {
+        "value": 0.11008059794761459,
+        "ci95": [
+          -0.04037042742804999,
+          0.2472872825645767
+        ],
+        "n": 157,
+        "clusters": 138,
+        "valid_resamples": 1000,
+        "bootstrap_rounds": 1000,
+        "seed": 42
+      }
+    },
+    "scope": "Exploratory Empathy prompt choice on cases valid under every judge/style. Format failures may make this subset unrepresentative; no universal or causal superiority claim."
+  },
+  "status": "awaiting_human"
+}

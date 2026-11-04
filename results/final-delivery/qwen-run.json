@@ -1,0 +1,33 @@
+{
+  "run_id": "E4-qwen-formal-003",
+  "session": "exp-e24-recovery-a100",
+  "started_at": "2026-11-04T14:16:39.442958+00:00",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+  "target_requests": 1000,
+  "state": "failed",
+  "commit": "373a1e00e84f46c6dd3f93a6483ca3e93d8939a9",
+  "hardware": {
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "gpu_memory_bytes": 42405855232,
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "quantization": "bitsandbytes NF4 4-bit"
+  },
+  "command": [
+    "/content/e4-venv/bin/python",
+    "scripts/run_qwen_batch.py",
+    "--batch-size",
+    "16",
+    "--requests",
+    "data/qwen-remaining-003.jsonl",
+    "--output",
+    "results/qwen.jsonl",
+    "--retry-unknown"
+  ],
+  "requests_file": "data/qwen-remaining-003.jsonl",
+  "returncode": 1,
+  "ended_at": "2026-11-04T14:28:59.153916+00:00",
+  "successful_requests": 979,
+  "failed_attempts": 21
+}

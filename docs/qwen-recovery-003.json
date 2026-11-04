@@ -18,9 +18,18 @@
   "batch_size": 16,
   "precision": "bitsandbytes NF4 with BF16 compute",
   "first_batch_completed_at": "2026-11-04T14:21:46.977452+00:00",
-  "remaining_completed_observed": 96,
-  "observed_at": "2026-11-04T14:23:19.849184+00:00",
+  "remaining_completed_observed": 359,
+  "observed_at": "2026-11-04T14:30:32.221985+00:00",
   "controller": "Mac E4 agent; official foreground colab exec; output connection remains active",
   "shared_runtime_policy": "E4 temporarily exclusive until its model exits, then E2 resumes; root owns runtime release",
-  "first_inference_started_at": "2026-11-04T14:21:27.315849+00:00"
+  "first_inference_started_at": "2026-11-04T14:21:27.315849+00:00",
+  "last_inference_ended_at": "2026-11-04T14:28:53.964177+00:00",
+  "remote_returncode": 1,
+  "strict_valid_requests": 979,
+  "strict_invalid_requests": 21,
+  "analyzable_after_one_syntax_recovery": 980,
+  "final_checkpoint": "gdrive:exp/runs/E4/E4-qwen-formal-003",
+  "final_checkpoint_ended_at": "2026-11-04T14:29:04.981802+00:00",
+  "gpu_handoff": "E2 notified after foreground returned at approximately14:29:05UTC; no more E4 GPU tasks",
+  "state": "awaiting_human"
 }
