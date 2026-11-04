@@ -134,12 +134,40 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     atomic_json(out/'formal-summary.json',report)
     write_jsonl(out/'disagreements.jsonl',sorted(badcases,key=lambda r:-r['absolute_error'])[:20])
     heatmap_svg(pointwise,out/'kappa.svg')
+    bias_svg([(r['provider']+'/'+r['dimension'],r['position_inconsistency']) for r in pairwise],out/'position-bias.svg','Canonical outcome inconsistency after swapping A/B; 95% cluster bootstrap CI')
+    bias_svg([(r['provider']+'/'+r['style']+'/'+r['dimension'],r['length_partial_spearman']) for r in pointwise],out/'length-bias.svg','Length association after control for independent human quality; not causal')
     lines=['# Judge alignment report','',f"Automated status: **{report['automated_status']}**; {len(successful)}/{expected} requests.",'',
            'All statistics use matched human/judge records; missing labels remain missing.','',
            '| Provider | Style | Dimension | N | QWK | Spearman |','|---|---|---|---:|---:|---:|']
     fmt=lambda x:'N/A' if x is None else f'{x:.4f}'
     for r in pointwise:lines.append(f"| {r['provider']} | {r['style']} | {r['dimension']} | {r['qwk']['n']} | {fmt(r['qwk']['value'])} | {fmt(r['spearman']['value'])} |")
-    lines+=['','![QWK](kappa.svg)','','## Human work remaining','',json.dumps(pending,ensure_ascii=False),
+    lines+=['','![QWK](kappa.svg)','','![Position bias](position-bias.svg)','','![Length bias](length-bias.svg)','','## Human work remaining','',json.dumps(pending,ensure_ascii=False),
             '',f"Delayed retest remaining: {max(0,report['retest_pending'])}",'','## Limitations','']+[f'- {s}' for s in report['limitations']]
     (out/'report.md').write_text('\n'.join(lines)+'\n')
     return report
+
+
+def bias_svg(rows,path,title):
+    """Render comparable -1..1 scale with explicit N/A for unavailable estimates."""
+    width,height=960,90+28*len(rows)
+    start,scale=610,230
+    nodes=[f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">',
+           '<rect width="100%" height="100%" fill="white"/>',
+           f'<text x="12" y="25" font-family="sans-serif" font-size="16">{html.escape(title)}</text>',
+           f'<line x1="{start}" x2="{start}" y1="50" y2="{height-20}" stroke="#777"/>']
+    for value in [-1,-.5,0,.5,1]:
+        x=start+scale*value
+        nodes.append(f'<text x="{x-10}" y="48" font-family="sans-serif" font-size="11">{value:g}</text>')
+    for i,(label,stat) in enumerate(rows):
+        y=60+28*i;value=stat.get('value');n=stat.get('n',0)
+        nodes.append(f'<text x="12" y="{y+15}" font-family="sans-serif" font-size="11">{html.escape(label)} (n={n})</text>')
+        if value is None:
+            nodes.append(f'<text x="{start+8}" y="{y+15}" font-family="sans-serif" font-size="11" fill="#777">N/A — pending or undefined</text>')
+            continue
+        left=min(start,start+scale*value);bar=abs(scale*value)
+        nodes.append(f'<rect x="{left}" y="{y}" width="{bar}" height="18" fill="#5a85b5"/>')
+        ci=stat.get('ci95')
+        if ci and None not in ci:
+            nodes.append(f'<line x1="{start+scale*ci[0]}" x2="{start+scale*ci[1]}" y1="{y+9}" y2="{y+9}" stroke="#111" stroke-width="2"/>')
+        nodes.append(f'<text x="855" y="{y+15}" font-family="sans-serif" font-size="11">{value:.3f}</text>')
+    nodes.append('</svg>');Path(path).write_text('\n'.join(nodes))
