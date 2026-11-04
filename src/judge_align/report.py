@@ -119,6 +119,8 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         'population':config.get('data_population'),'primary_count':len(primary),'pair_count':len(pairs),
         'bootstrap_unit':'Dialogue-prefix connected component across roles; all response variants and pair orientations remain together',
         'successful_requests':len(successful),'expected_requests':expected,
+        'strict_json_successful_requests':sum(row.get('record_type')!='format_recovery' for row in successful.values()),
+        'format_recovered_requests':sum(row.get('record_type')=='format_recovery' for row in successful.values()),
         'failed_attempts':sum(row.get('status')=='failed' for row in judgments),
         'failed_request_configs':len(failed),
         'automated_status':'complete' if len(successful)==expected and len(primary)==config['sample_count'] and len(pairs)==config['sample_count'] else 'partial',
@@ -143,6 +145,8 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     structured_retries=sum(row.get('status')=='success' and row.get('provider_metadata',{}).get('structured_output',False) for row in judgments)
     if structured_retries:
         report['execution_changes'].append(f'{structured_retries} Gemini pairwise requests completed with an explicit JSON Schema after malformed JSON replies; prompts, candidate order and winner categories were unchanged.')
+    if report['format_recovered_requests']:
+        report['execution_changes'].append(f"{report['format_recovered_requests']} Qwen outputs recovered by removing only trailing commas outside JSON strings. Original parse failures and billed usage remain recorded; no model was called and no score changed.")
     atomic_json(out/'split-manifest.json',report['prompt_selection']['manifest'])
     atomic_json(out/'formal-summary.json',report)
     by_case=defaultdict(list)

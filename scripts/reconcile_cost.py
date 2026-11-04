@@ -19,7 +19,7 @@ for name in ('deepseek', 'gemini'):
     unknown = 0
     for row in rows:
         states[row['run_key']] = row['status']
-        if row['status'] not in ('success', 'failed'):
+        if row['status'] not in ('success', 'failed') or row.get('record_type')=='format_recovery':
             continue
         totals['terminal_attempts'] += 1
         totals[row['status'] + '_attempts'] += 1
