@@ -37,6 +37,8 @@ There are 600 pointwise and 400 paired-orientation requests per provider. Three 
 
 DeepSeek output capacity is 8192 tokens; the first formal responses used 1536, which truncated reasoning-heavy replies. Complete earlier results are retained and failed requests are retried. Reports disclose the observed configuration hashes.
 
+Gemini's original worker also uses 1536. After a real pairwise reply reached `MAX_TOKENS` with 1470 thinking tokens, the continuation configuration was raised to 8192 for missing requests only. The active original worker is not restarted; successful outputs remain unchanged.
+
 The runner uses an exclusive output-file lock. A request is durably recorded before submission, and successful `(request_id, requested_model)` pairs are skipped after restart, including after output-capacity adjustment. Each raw result retains its provider configuration hash. An interrupted request with unknown billing outcome requires investigation before explicitly adding `--retry-unknown`. Provider/auth/network errors stop this provider rather than spending across the remaining queue; malformed replies are recorded and fail the command. At most three recorded failed attempts per request.
 
 ## Qwen on an already allocated Colab GPU

@@ -18,7 +18,7 @@
       "base_url": "https://generativelanguage.googleapis.com/v1beta",
       "key_env": "GEMINI_API_KEY",
       "model_env": "GEMINI_MODEL",
-      "max_output_tokens": 1536,
+      "max_output_tokens": 8192,
       "pricing_usd_per_million": null,
       "model": "gemini-3.8-flash"
     },

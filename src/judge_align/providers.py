@@ -75,7 +75,8 @@ class APIProvider:
             u=result.get("usageMetadata",{})
             usage={"input_tokens":u.get("promptTokenCount"),"output_tokens":u.get("candidatesTokenCount"),
                    "thought_tokens":u.get("thoughtsTokenCount",0),"cached_input_tokens":u.get("cachedContentTokenCount",0),"provider_usage":u}
-            return text,usage,{"model":result.get("modelVersion",self.model),"finish_reason":candidates[0].get("finishReason")}
+            return text,usage,{"model":result.get("modelVersion",self.model),"finish_reason":candidates[0].get("finishReason"),
+                               "max_output_tokens":payload['generationConfig']['maxOutputTokens']}
         raise ProviderError("Unsupported API provider type")
 
 

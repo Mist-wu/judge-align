@@ -125,7 +125,8 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         'pointwise':pointwise,'pairwise':pairwise,'human_reliability':reliability,
         'config_sha256':digest(config),'data_sha256':digest(cases),'judgments_sha256':digest(judgments),
         'observed_provider_config_hashes':{k:sorted(v) for k,v in provider_configs.items()},
-        'execution_changes':['DeepSeek output capacity increased from 1536 to 8192 after truncated reasoning responses; prior complete outputs are retained.'],
+        'execution_changes':[f'{provider} output capacity increased from 1536 to 8192 after truncated reasoning responses; prior complete outputs are retained.'
+                             for provider in ['deepseek','gemini'] if len(provider_configs[provider])>1],
         'cost':{'known_estimated_usd':sum(r.get('estimated_cost_usd') or 0 for r in judgments if r.get('status') in {'success','failed'}),
                 'unknown_pricing_terminal_attempts':sum(r.get('estimated_cost_usd') is None for r in judgments if r.get('status') in {'success','failed'}),
                 'ambiguous_inflight_attempts':sum(status=='started' for status in {r.get('run_key'):r.get('status') for r in judgments}.values())},
