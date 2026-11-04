@@ -115,12 +115,23 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     primary=[c for c in cases if c['primary']]
     expected=len(config['providers'])*(len(primary)*3+len(pairs)*2)
     pending={d:sum(d not in references[c['id']] for c in primary) for d in DIMENSIONS}
+    format_outcomes={}
+    for provider in config['providers']:
+        terminal=[row for row in judgments if row.get('provider')==provider
+                  and row.get('status') in {'success','failed'} and row.get('record_type')!='format_recovery']
+        first={}
+        for row in sorted(terminal,key=lambda row:row['ended_at']):first.setdefault(row['request_id'],row)
+        format_outcomes[provider]={'first_attempt_successes':sum(row['status']=='success' for row in first.values()),
+            'first_attempt_failures':sum(row['status']=='failed' for row in first.values()),
+            'terminal_inference_attempts':len(terminal),'retry_attempts':len(terminal)-len(first),
+            'format_recoveries':sum(row.get('provider')==provider and row.get('record_type')=='format_recovery' for row in successful.values())}
     report={'run_kind':'formal','created_at':now(),'source_commit':primary[0].get('source_commit') if primary else None,
         'population':config.get('data_population'),'primary_count':len(primary),'pair_count':len(pairs),
         'bootstrap_unit':'Dialogue-prefix connected component across roles; all response variants and pair orientations remain together',
         'successful_requests':len(successful),'expected_requests':expected,
         'strict_json_successful_requests':sum(row.get('record_type')!='format_recovery' for row in successful.values()),
         'format_recovered_requests':sum(row.get('record_type')=='format_recovery' for row in successful.values()),
+        'format_outcomes':format_outcomes,
         'failed_attempts':sum(row.get('status')=='failed' for row in judgments),
         'failed_request_configs':len(failed),
         'automated_status':'complete' if len(successful)==expected and len(primary)==config['sample_count'] and len(pairs)==config['sample_count'] else 'partial',
@@ -132,7 +143,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         'execution_changes':[f'{provider} output capacity increased from 1536 to 8192 after truncated reasoning responses; prior complete outputs are retained.'
                              for provider in ['deepseek','gemini'] if len(provider_configs[provider])>1],
         'cost':{'known_estimated_usd':sum(r.get('estimated_cost_usd') or 0 for r in judgments if r.get('status') in {'success','failed'}),
-                'unknown_pricing_terminal_attempts':sum(r.get('estimated_cost_usd') is None for r in judgments if r.get('status') in {'success','failed'}),
+                'unknown_pricing_terminal_attempts':sum(r.get('estimated_cost_usd') is None for r in judgments if r.get('status') in {'success','failed'} and r.get('record_type')!='format_recovery'),
                 'ambiguous_inflight_attempts':sum(status=='started' for status in {r.get('run_key'):r.get('status') for r in judgments}.values())},
         'limitations':['Empathy-only source population; other custom dimensions require new human annotation.',
                        'Frozen custom empathy anchors differ from the upstream annotation examples; disagreement does not establish which judgment is correct.',
@@ -162,6 +173,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     bias_svg([(r['provider']+'/'+r['dimension'],r['position_inconsistency']) for r in pairwise],out/'position-bias.svg','Canonical outcome inconsistency after swapping A/B; 95% cluster bootstrap CI')
     bias_svg([(r['provider']+'/'+r['style']+'/'+r['dimension'],r['length_partial_spearman']) for r in pointwise],out/'length-bias.svg','Length association after control for independent human quality; not causal')
     lines=['# Judge alignment report','',f"Automated status: **{report['automated_status']}**; {len(successful)}/{expected} requests.",'',
+           f"Standard JSON parser successes: {report['strict_json_successful_requests']}; transparent syntax-only recoveries: {report['format_recovered_requests']}. Original failed attempts remain in the ledger.",'',
            'All statistics use matched human/judge records; missing labels remain missing.','',
            '| Provider | Style | Dimension | N | QWK [95% CI] | Spearman [95% CI] |','|---|---|---|---:|---:|---:|']
     fmt=lambda x:'N/A' if x is None else f'{x:.4f}'
@@ -189,6 +201,11 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                   'This selection does not establish superiority on other dimensions or populations.']
     else:
         lines += ['', 'Prompt selection waits for all pointwise requests.']
+    lines += ['', '## Inference format outcomes', '',
+              '| Provider | First-attempt success | First-attempt failure | Additional model attempts | Offline format recovery |',
+              '|---|---:|---:|---:|---:|']
+    for provider,stats in format_outcomes.items():
+        lines.append(f"| {provider} | {stats['first_attempt_successes']} | {stats['first_attempt_failures']} | {stats['retry_attempts']} | {stats['format_recoveries']} |")
     lines+=['','![QWK](kappa.svg)','','![Position bias](position-bias.svg)','','![Length bias](length-bias.svg)','','## Human work remaining','',json.dumps(pending,ensure_ascii=False),
             '',f"Delayed retest remaining: {max(0,report['retest_pending'])}",'','## Limitations','']+[f'- {s}' for s in report['limitations']]
     (out/'report.md').write_text('\n'.join(lines)+'\n')
