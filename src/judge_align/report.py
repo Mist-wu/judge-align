@@ -6,6 +6,7 @@ from pathlib import Path
 from .data import DIMENSIONS,validate_annotations
 from .io import atomic_json,digest,now,write_jsonl
 from .metrics import canonical_winner,cluster_ci,mean,partial_spearman,qwk,spearman
+from .selection import select_on_development
 
 
 def heatmap_svg(pointwise,path):
@@ -131,6 +132,8 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                        'Length partial correlation controls observed human quality only; it is not causal.',
                        'Pairwise choices are not ordinal 1–5 scores and are not entered in the QWK heatmap.',
                        'Human retest reliability is not a mathematical upper bound on judge agreement.']}
+    report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds)
+    atomic_json(out/'split-manifest.json',report['prompt_selection']['manifest'])
     atomic_json(out/'formal-summary.json',report)
     write_jsonl(out/'disagreements.jsonl',sorted(badcases,key=lambda r:-r['absolute_error'])[:20])
     heatmap_svg(pointwise,out/'kappa.svg')
@@ -138,9 +141,26 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     bias_svg([(r['provider']+'/'+r['style']+'/'+r['dimension'],r['length_partial_spearman']) for r in pointwise],out/'length-bias.svg','Length association after control for independent human quality; not causal')
     lines=['# Judge alignment report','',f"Automated status: **{report['automated_status']}**; {len(successful)}/{expected} requests.",'',
            'All statistics use matched human/judge records; missing labels remain missing.','',
-           '| Provider | Style | Dimension | N | QWK | Spearman |','|---|---|---|---:|---:|---:|']
+           '| Provider | Style | Dimension | N | QWK [95% CI] | Spearman [95% CI] |','|---|---|---|---:|---:|---:|']
     fmt=lambda x:'N/A' if x is None else f'{x:.4f}'
-    for r in pointwise:lines.append(f"| {r['provider']} | {r['style']} | {r['dimension']} | {r['qwk']['n']} | {fmt(r['qwk']['value'])} | {fmt(r['spearman']['value'])} |")
+    def interval(stat):
+        ci=stat.get('ci95')
+        return fmt(stat['value']) + (f" [{fmt(ci[0])}, {fmt(ci[1])}]" if ci else '')
+    for r in pointwise:lines.append(f"| {r['provider']} | {r['style']} | {r['dimension']} | {r['qwk']['n']} | {interval(r['qwk'])} | {interval(r['spearman'])} |")
+    lines+=['','## Position swaps','',
+            '| Provider | Dimension | Complete pairs | Inconsistency [95% CI] | Decisive A/B flip [95% CI] |',
+            '|---|---|---:|---:|---:|']
+    for r in pairwise:lines.append(f"| {r['provider']} | {r['dimension']} | {r['position_inconsistency']['n']} | {interval(r['position_inconsistency'])} | {interval(r['decisive_flip_rate'])} |")
+    selection=report['prompt_selection']
+    lines+=['','## Development / held-out test split','',
+            'Contexts, including all styles and pair orientations, are kept together. The split was frozen after generation began but before inspecting aggregate rankings; this is exploratory, not preregistered.']
+    if selection['state']=='complete':
+        picked=selection['selected'];held=selection['held_out_test']
+        lines += ['',f"Selected only on development Empathy QWK: **{picked['provider']} / {picked['style']}** (development n={picked['n']}).",
+                  f"Held-out test n={held['qwk']['n']}; QWK {interval(held['qwk'])}; Spearman {interval(held['spearman'])}.",
+                  'This selection does not establish superiority on other dimensions or populations.']
+    else:
+        lines += ['', 'Prompt selection waits for all pointwise requests.']
     lines+=['','![QWK](kappa.svg)','','![Position bias](position-bias.svg)','','![Length bias](length-bias.svg)','','## Human work remaining','',json.dumps(pending,ensure_ascii=False),
             '',f"Delayed retest remaining: {max(0,report['retest_pending'])}",'','## Limitations','']+[f'- {s}' for s in report['limitations']]
     (out/'report.md').write_text('\n'.join(lines)+'\n')

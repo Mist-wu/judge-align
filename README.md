@@ -58,12 +58,12 @@ Fill the blinded `data/human-template.jsonl` using `docs/rubric.md`; the four cu
 python3 scripts/run.py annotations --validate data/human-initial.jsonl
 python3 scripts/run.py report --judgments results/deepseek.jsonl results/gemini.jsonl results/qwen.jsonl
 # Add --human data/human-combined.jsonl only after genuine initial/retest annotation.
-python3 scripts/verify_completion.py
+python3 scripts/reconcile_cost.py
 ```
 
 Outputs are `results/formal-summary.json`, `report.md`, `kappa.svg` and `disagreements.jsonl`. QWK and Spearman use exact paired samples with 1,000 context-cluster bootstrap resamples. Position bias uses both pair orientations. Length partial Spearman stays unavailable until independent human quality scores exist. Unknown/undefined values are `null` rather than fabricated zeros. Pairwise preference agreement is separate from ordinal QWK.
 
-Formal result checks reject partial or synthetic runs. Automated completion still leaves `human_pending`; it does not certify the whole experiment complete. Costs and token accounting are described in `docs/cost.md`.
+The report records the actual completed-request count. Automated completion still leaves `human_pending`; it does not certify the whole experiment complete. Costs and token accounting are described in `docs/cost.md`.
 
 ## Sources
 
