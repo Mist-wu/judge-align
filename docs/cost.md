@@ -1,39 +1,27 @@
 # E4 cost ledger
 
-Initial preparation: public source downloads and local tests only; no paid API calls or GPU allocation by the E4 implementation worker.
+The completed API campaign has a **known paid-list-price estimate of $3.57763116**, plus one original DeepSeek attempt with unknown usage. This is not an invoice; Gemini free-tier eligibility was not checked. Qwen's Colab compute units are separate. The reproducible calculation is `results/cost-summary.json`, generated at 2026-11-04 13:56:19 UTC from the merged raw ledgers.
 
-Each `results/<provider>.jsonl` records every started/terminal request, exact model/config hash, input/output/cache/thought token counts when supplied, timestamps and provider metadata. A crash after request submission remains `started`: billing is unknown, and automatic resume refuses to repeat it. After operator review, `--retry-unknown` permits an explicit retry. Three failed recorded attempts stop that request; transient HTTP 429/5xx have up to three transport attempts.
+| Provider / requested model | Unique scheduled requests executed | Terminal attempts | Failed attempts | Input tokens | Cached input tokens | Output tokens | Additional thinking tokens | Known estimate USD |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| DeepSeek / `deepseek-flash` | 1,000 | 1,005 | 5 | 1,145,784 | 634,621 | 863,771 | 0 additional | 0.59684091 |
+| Gemini / `gemini-3.8-flash` | 1,000 | 1,016 | 25 | 1,208,802 | 0 | 147,241 visible | 405,876 | 2.98079025 |
 
-`pricing_usd_per_million` starts at null. Fill official current per-million input/output/cache prices in a frozen configuration before formal work if dollar estimates are needed. Null pricing is reported as unknown, never zero. Provider invoices remain authoritative. Failed parse responses can still consume tokens and are included in known estimated spend. There is no artificial budget cutoff.
+Cached input is part of input, not an additional token count. DeepSeek output already includes reasoning tokens. Gemini's visible output and thinking are added for output pricing. All returned usage, including failed JSON responses and retries, is charged in the estimate. The original DeepSeek empty-visible-content failure predates usage-preservation repair and has unknown token cost; it is not counted as free. Neither API has an in-flight request in this snapshot. No further API requests are planned to replace the remaining format failures.
 
-Root owns Colab allocation. Record each Qwen session's ID, GPU, start/stop, actual CU rate and balance here after it ends; do not start a new session from this repository. Qwen emits torch/CUDA/GPU/model revision metadata. E4 is running on the existing `exp-e4-qwen` A100 session; details follow below.
+The recorded rates were verified on **2026-11-04**: Gemini paid standard input $0.75/M, cached input $0.075/M, and output including thinking $3.75/M; DeepSeek off-peak uncached input $0.15/M, cached input $0.003/M, and output $0.60/M. This campaign's recorded API calls fall in the 10:00–24:00 UTC off-peak interval. These rates describe the recorded reconciliation, not a promise of future pricing. [Gemini pricing](https://aistudio.google.com/docs/pricing#gemini-3.8-flash), [DeepSeek pricing](https://api-docs.deepseek.com/quick_start/pricing/).
 
-| Session | GPU | Start/end UTC | Rate CU/h | CU consumed | Status |
-|---|---|---|---|---|---|
-| exp-e4-qwen | A100-SXM4-40GB | 2026-11-04 12:20:25 / running | 6.73 (allocation delta observed by coordinator) | Pending end time; shared with E2 from later in the run | Running |
+Run `python3 scripts/reconcile_cost.py` from the repository to regenerate the summary. The script does not rewrite raw model configurations or usage. Source ledgers are `results/deepseek.jsonl` and `results/gemini.jsonl`; original server exports are retained in `results/original-api/`, retry ledgers remain separate, and `results/api-merge-receipt.json` records the deduplicated merge. Successful request IDs are not charged again merely because configuration hashes changed. Offline trailing-comma recovery makes no model request and adds no token usage.
 
-## Recorded API usage — 2026-11-04
+## Colab GPU accounting
 
-The first recorded request from each API provider returned valid four-dimension JSON scores. Their raw records remain in `results/gemini.jsonl` and `results/deepseek.jsonl`; the formal campaign reuses them. The full API queues now run under `exp-e4-apis.service`. No GPU is allocated by this API-only unit.
+| Runtime | Observed GPU | Recorded interval / state | Accounting boundary |
+|---|---|---|---|
+| `exp-e4-qwen` | NVIDIA A100-SXM4-40GB | Allocated 2026-11-04 12:20:25 UTC; absent from actual assignments at approximately 13:49 UTC | Shared with E2 from 12:51:14 UTC; exact termination time and E4-only CU are unknown |
+| `exp-e24-recovery-a100` | NVIDIA A100-SXM4-40GB | E4 run `E4-qwen-formal-003` started 2026-11-04 14:16:39 UTC; dependency installation complete and model loading observed | E4 has exclusive model use for its remaining requests, then hands the same runtime to E2; allocation time is separate from inference start |
 
-| Model | End UTC | Input | Visible output | Additional thinking | Cache hit | Published-price estimate USD |
-|---|---|---:|---:|---:|---:|---:|
-| gemini-3.8-flash | 11:21:15 | 979 | 28 | 299 | 0 | 0.00196050 |
-| deepseek-flash | 11:21:36 | 937 | 833 (includes 801 reasoning) | 0 additional | 0 | 0.00064035 |
+The coordinator observed an A100 allocation increment of **6.73 CU/hour**. Runtime billing includes preparation and idle time as well as inference. This rate is not a per-process invoice; aggregate account balance cannot uniquely attribute a shared runtime to E4, and the same shared interval must not be charged independently to both E4 and E2. Final runtime residence and actual account balance remain to be collected by the coordinator. Do not release the replacement runtime when E4 finishes: E2 still needs it.
 
-Total published-price estimate: **$0.00260085**. Gemini paid standard rates were verified as $0.75/M input and $3.75/M output including thinking, valid through 2026-12-31; whether this account receives a free tier was not checked. DeepSeek request occurred outside published peak windows (UTC 01:00–04:00 and 06:00–10:00), using $0.15/M uncached input and $0.60/M output. These are computed list-price estimates, not an invoice. [Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash), [DeepSeek pricing](https://api-docs.deepseek.com/quick_start/pricing/).
+`E4-qwen-formal-001` failed before scoring due to torch/torchvision incompatibility; its artifacts remain in `results/qwen-failed-001/`. Run `002` produced a durable checkpoint with **641 terminal request IDs: 632 valid and 9 format failures**, last terminal timestamp 13:45:20.924487 UTC. The old assignment then disappeared. Run `003` restores those records and submits only the **359 original IDs without a terminal outcome**, including one previously in-flight ID whose outcome was lost. It does not regenerate the 9 terminal format failures.
 
-Request pricing remains null in the execution config. Continuation deduplicates successful `(request_id, requested_model)` pairs even after output capacity changes, so it does not repeat successful calls. This post-hoc price reconciliation is separate from raw provider events. For the complete run, reconcile dynamic peak/off-peak prices by request timestamp and re-check published prices; never change model or inference settings while resuming an existing result file.
-
-## Formal continuation change
-
-At 2026-11-04 12:00 UTC, DeepSeek output capacity was increased from 1536 to 8192 after reasoning tokens truncated two visible JSON responses and consumed the entire output in a third. Existing complete results were retained. The new adapter preserves usage and finish reason even for empty visible content. The original empty-content attempt predates that fix and has unknown token cost; do not treat it as free. `exp-e4-deepseek.service` continues this provider while Gemini's original worker is unchanged.
-
-## E4 Qwen allocation
-
-A single A100 request succeeded at 2026-11-04 12:20:25 UTC: session `exp-e4-qwen`, endpoint `gpu-a100-s-ass1c0-28f4fskn9e3s6`. Original run `E4-qwen-formal-001` failed before scoring because of a torch/torchvision mismatch; its failure artifacts are preserved. Full 1000-request inference continues as `E4-qwen-formal-002` after removing unused torchvision; actual GPU and torch/CUDA versions are written to `results/qwen-run.json`, and Drive copy receipts to `results/qwen-drive-copy.json`. Record final CU balance after collection and stop.
-
-
-Current usage can be recomputed with `python3 scripts/reconcile_cost.py`. It counts failed replies with returned usage and keeps missing usage unknown; the one original empty-content failure has unknown tokens. The post-hoc JSON uses Gemini paid list prices (free-tier eligibility unknown) and the actual off-peak timing of this campaign. It does not rewrite raw inference configuration or provider events.
-
-The A100 is shared with E2 in an independent environment. Its CU rate is billed per runtime, not separately per process. Shared-period CU cannot be uniquely assigned to E4 from aggregate account balance. Do not release the runtime until both experiments are collected.
+The replacement uses batch size 16 with left padding, the same fixed Qwen model/revision, NF4/BF16 settings, greedy decoding, and 1,536-token output limit. It records per-row input and generated tokens excluding padding. `docs/qwen-recovery-003.json` describes the recovery boundary; hardware, environment, final exit status and checkpoint receipts are in the run's `results/qwen-run.json`, `qwen-env.txt`, and `qwen-drive-copy.json`. Drive checkpoints go to `gdrive:exp/runs/E4/E4-qwen-formal-003` every 120 seconds and at exit.
