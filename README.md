@@ -8,7 +8,7 @@ Compare DeepSeek, Gemini and Qwen judges with actual human labels, preserving mi
 | Distinct same-context candidate pairs | 200 |
 | Planned judge requests, including both pair orders | 3,000 |
 
-**Formal metrics are pending; these counts are preparation results, not evidence of judge quality.** Other custom dimensions need human labels. API judges run on the server; Qwen runs only on an allocated CUDA Colab runtime, independent of the Mac.
+**Formal metrics are pending; these counts are preparation results, not evidence of judge quality.** AWS integration smoke succeeded for one Gemini 3.8-flash and one DeepSeek flash request on 2026-11-04; see `docs/aws-smoke.json`. Other custom dimensions need human labels. API judges run on the server; Qwen runs only on an allocated CUDA Colab runtime, independent of the Mac.
 
 ## Reproduce preparation and tests
 
