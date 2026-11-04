@@ -11,7 +11,7 @@
 - CPU 25%, memory 256 MiB. The transient systemd unit survives SSH/Mac disconnection.
 - The campaign script reads provider credentials into subprocess environments; never print `/srv/exp-runner/secrets/providers.env`.
 
-Do not duplicate either active provider. Refresh actual unit states and unique successful-request counts with `python3 scripts/progress.py`; snapshot is saved in `docs/formal-progress.json`. At **2026-11-04 21:01:40 JST**, Gemini had **175/1000** successful requests, DeepSeek **19/1000**, and all three earlier DeepSeek failed requests had been resolved. These are a timestamped progress snapshot, not completion.
+Do not duplicate either active provider. Refresh actual unit states and unique successful-request counts with `python3 scripts/progress.py`; snapshot is saved in `docs/formal-progress.json`. At **2026-11-04 12:05:30 UTC**, `python3 scripts/progress.py` reported both units active, Gemini **208/1000** and DeepSeek **55/1000** unique successful requests; all three earlier DeepSeek failed requests had been resolved. These are a timestamped progress snapshot, not completion. `colab ls` reported existing sessions `exp-preflight-l4`, `exp-e5-formal`, and `exp-e1-prep`: both GPU slots are occupied by E2 and E5, so do not allocate Qwen yet. Refresh with `python3 scripts/progress.py` and check GPU availability before submitting Qwen.
 
 The requested-model and request-id pair determines whether a successful result is reused. The report records all observed provider config hashes and the 1536 → 8192 DeepSeek capacity change. Empty content now retains provider usage before being recorded as a failed parse.
 
