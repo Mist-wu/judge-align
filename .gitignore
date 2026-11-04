@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+data/raw/
+data/*.jsonl
+data/source-manifest.json
+results/*
+!results/.gitkeep
+figures/*
+!figures/.gitkeep
+logs/

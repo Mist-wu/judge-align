@@ -1,0 +1,34 @@
+{
+  "seed": 42,
+  "sample_count": 200,
+  "bootstrap_rounds": 1000,
+  "data_population": "CharacterEval released Empathy-annotated subset",
+  "providers": {
+    "deepseek": {
+      "type": "openai-compatible",
+      "base_url": "https://api.deepseek.com",
+      "key_env": "DEEPSEEK_API_KEY",
+      "model_env": "DEEPSEEK_MODEL",
+      "max_output_tokens": 1536,
+      "pricing_usd_per_million": null,
+      "model": "deepseek-flash"
+    },
+    "gemini": {
+      "type": "gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "key_env": "GEMINI_API_KEY",
+      "model_env": "GEMINI_MODEL",
+      "max_output_tokens": 1536,
+      "pricing_usd_per_million": null,
+      "model": "gemini-3.8-flash"
+    },
+    "qwen": {
+      "type": "transformers",
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+      "max_input_tokens": 8192,
+      "max_output_tokens": 1536,
+      "pricing_usd_per_million": null
+    }
+  }
+}
