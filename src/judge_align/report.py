@@ -130,6 +130,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                 'unknown_pricing_terminal_attempts':sum(r.get('estimated_cost_usd') is None for r in judgments if r.get('status') in {'success','failed'}),
                 'ambiguous_inflight_attempts':sum(status=='started' for status in {r.get('run_key'):r.get('status') for r in judgments}.values())},
         'limitations':['Empathy-only source population; other custom dimensions require new human annotation.',
+                       'Frozen custom empathy anchors differ from the upstream annotation examples; disagreement does not establish which judgment is correct.',
                        'Released reward-model training data are public and potentially contaminated.',
                        'Published candidate alternatives include Qwen/Baichuan; Qwen judge self-preference is a possible confound.',
                        'Length partial correlation controls observed human quality only; it is not causal.',
