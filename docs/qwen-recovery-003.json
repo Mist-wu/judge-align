@@ -11,5 +11,16 @@
   "lost_inflight_request_ids": [
     "1dc9fcac701787939a117c289b866210b60b78c55d81d078583cbcb6e4a79780"
   ],
-  "resume_policy": "Only IDs without checkpoint terminal outcomes; existing successful and format-failed outputs are excluded; --retry-unknown explicitly permits the lost in-flight row."
+  "resume_policy": "Only IDs without checkpoint terminal outcomes; existing successful and format-failed outputs are excluded; --retry-unknown explicitly permits the lost in-flight row.",
+  "new_session": "exp-e24-recovery-a100",
+  "new_endpoint": "gpu-a100-s-ass1b0-kysuwtw187ve",
+  "new_run_started_at": "2026-11-04T14:16:39.442958+00:00",
+  "batch_size": 16,
+  "precision": "bitsandbytes NF4 with BF16 compute",
+  "first_batch_completed_at": "2026-11-04T14:21:46.977452+00:00",
+  "remaining_completed_observed": 96,
+  "observed_at": "2026-11-04T14:23:19.849184+00:00",
+  "controller": "Mac E4 agent; official foreground colab exec; output connection remains active",
+  "shared_runtime_policy": "E4 temporarily exclusive until its model exits, then E2 resumes; root owns runtime release",
+  "first_inference_started_at": "2026-11-04T14:21:27.315849+00:00"
 }

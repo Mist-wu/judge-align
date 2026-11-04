@@ -156,6 +156,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                        'Published candidate alternatives include Qwen/Baichuan; Qwen judge self-preference is a possible confound.',
                        'Length partial correlation controls observed human quality only; it is not causal.',
                        'Pairwise choices are not ordinal 1–5 scores and are not entered in the QWK heatmap.',
+                       'Invalid JSON outputs are excluded from agreement metrics; format-related missingness may bias valid-sample estimates.',
                        'Human retest reliability is not a mathematical upper bound on judge agreement.']}
     report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds,attempted)
     structured_retries=sum(row.get('status')=='success' and row.get('provider_metadata',{}).get('structured_output',False) for row in judgments)
