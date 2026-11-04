@@ -28,3 +28,7 @@ Request pricing remains null in the execution config. Continuation deduplicates 
 ## Formal continuation change
 
 At 2026-11-04 12:00 UTC, DeepSeek output capacity was increased from 1536 to 8192 after reasoning tokens truncated two visible JSON responses and consumed the entire output in a third. Existing complete results were retained. The new adapter preserves usage and finish reason even for empty visible content. The original empty-content attempt predates that fix and has unknown token cost; do not treat it as free. `exp-e4-deepseek.service` continues this provider while Gemini's original worker is unchanged.
+
+## E4 Qwen allocation
+
+A single A100 request succeeded at 2026-11-04 12:20:25 UTC: session `exp-e4-qwen`, endpoint `gpu-a100-s-ass1c0-28f4fskn9e3s6`. Full 1000-request inference uses run ID `E4-qwen-formal-001`; actual GPU and torch/CUDA versions are written to `results/qwen-run.json`, and Drive copy receipts to `results/qwen-drive-copy.json`. Record final CU balance after collection and stop.

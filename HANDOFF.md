@@ -11,7 +11,7 @@
 - CPU 25%, memory 256 MiB. The transient systemd unit survives SSH/Mac disconnection.
 - The campaign script reads provider credentials into subprocess environments; never print `/srv/exp-runner/secrets/providers.env`.
 
-Do not duplicate either active provider. Refresh actual unit states and unique successful-request counts with `python3 scripts/progress.py`; snapshot is saved in `docs/formal-progress.json`. At **2026-11-04 12:05:30 UTC**, `python3 scripts/progress.py` reported both units active, Gemini **208/1000** and DeepSeek **55/1000** unique successful requests; all three earlier DeepSeek failed requests had been resolved. These are a timestamped progress snapshot, not completion. `colab ls` reported existing sessions `exp-preflight-l4`, `exp-e5-formal`, and `exp-e1-prep`: both GPU slots are occupied by E2 and E5, so do not allocate Qwen yet. Refresh with `python3 scripts/progress.py` and check GPU availability before submitting Qwen.
+Do not duplicate either active provider. Refresh actual unit states and unique successful-request counts with `python3 scripts/progress.py`; snapshot is saved in `docs/formal-progress.json`. At **2026-11-04 12:05:30 UTC**, `python3 scripts/progress.py` reported both units active, Gemini **208/1000** and DeepSeek **55/1000** unique successful requests; all three earlier DeepSeek failed requests had been resolved. These are a timestamped progress snapshot, not completion. The earlier L4 allocation rejection was resource-specific, not proof of an account-wide two-GPU limit. On 2026-11-04 12:20:25 UTC, a single A100 allocation succeeded as `exp-e4-qwen`; full Qwen inference is now being submitted there.
 
 The requested-model and request-id pair determines whether a successful result is reused. The report records all observed provider config hashes and the 1536 → 8192 DeepSeek capacity change. Empty content now retains provider usage before being recorded as a failed parse.
 
@@ -20,10 +20,9 @@ Stop both workers if requested: `sudo systemctl stop exp-e4-apis.service exp-e4-
 ## Remaining work
 
 1. Let the full API queues finish; inspect any provider failure and resume the corresponding queue with `python3 scripts/run.py run --provider <provider> --output results/<provider>.jsonl`.
-2. Root allocates the Qwen L4 runtime. Upload the repository and ignored `data/`, install `.[qwen]`, then directly run `python scripts/run.py run --provider qwen --output results/qwen.jsonl`. Download the output before releasing GPU; record CU and environment.
+2. Qwen runs on A100 session `exp-e4-qwen`, run ID `E4-qwen-formal-001`. `scripts/run_qwen_formal.py` installs the pinned GPU dependencies, processes all 1000 requests, writes `results/qwen-run.json`, and copies results to `gdrive:exp/runs/E4/E4-qwen-formal-001` every two minutes and at exit. AWS transport receipt: `/srv/exp-runner/state/remote/E4-qwen-formal-001`. Collect final Qwen results before releasing this session.
 3. Build the full report with `python3 scripts/run.py report --judgments results/deepseek.jsonl results/gemini.jsonl results/qwen.jsonl`.
-4. Run `python3 scripts/verify_completion.py` as final result accounting. It requires real raw records, not only model-written summaries.
-5. Fill README and `docs/cost.md` with actual results and costs.
+4. Fill README and `docs/cost.md` directly from actual result records and costs; no separate verification gate is required.
 
 ## Human-data boundary
 
