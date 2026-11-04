@@ -68,6 +68,6 @@ def metadata(config):
     def git(args):
         p = subprocess.run(["git", *args], capture_output=True, text=True)
         return p.stdout.strip() if p.returncode == 0 else None
-    return {"created_at": now(), "git_commit": git(["rev-parse", "HEAD"]),
+    return {"created_at": now(), "git_commit": git(["rev-parse", "HEAD"]) or os.environ.get('EXPERIMENT_COMMIT'),
             "git_dirty": bool(git(["status", "--porcelain"])), "config_sha256": digest(config),
             "python": platform.python_version(), "platform": platform.platform()}

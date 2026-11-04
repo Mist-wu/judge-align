@@ -110,6 +110,31 @@ class QwenProvider:
         continuation=outputs[0,length:]
         return self.tokenizer.decode(continuation,skip_special_tokens=True),{"input_tokens":length,"output_tokens":len(continuation),"cached_input_tokens":0},{"model":self.model_name,**self.env}
 
+    def generate_batch(self,conversations):
+        import torch
+        self.tokenizer.padding_side='left'
+        if self.tokenizer.pad_token_id is None:self.tokenizer.pad_token_id=self.tokenizer.eos_token_id
+        inputs=self.tokenizer.apply_chat_template(conversations,tokenize=True,add_generation_prompt=True,
+            padding=True,return_tensors='pt',return_dict=True).to(self.model.device)
+        lengths=inputs['attention_mask'].sum(dim=1).tolist()
+        if max(lengths)>self.config.get('max_input_tokens',8192):
+            raise ProviderError('A batch input exceeds the frozen input capacity; no truncation was applied')
+        width=inputs['input_ids'].shape[1]
+        with torch.inference_mode():
+            outputs=self.model.generate(**inputs,max_new_tokens=self.config.get('max_output_tokens',1536),
+                do_sample=False,pad_token_id=self.tokenizer.eos_token_id)
+        eos=self.model.generation_config.eos_token_id
+        eos=set(eos if isinstance(eos,list) else [eos])
+        result=[]
+        for length,sequence in zip(lengths,outputs[:,width:].tolist()):
+            end=next((i+1 for i,token in enumerate(sequence) if token in eos),len(sequence))
+            tokens=sequence[:end]
+            result.append((self.tokenizer.decode(tokens,skip_special_tokens=True),
+                {'input_tokens':length,'output_tokens':len(tokens),'cached_input_tokens':0},
+                {'model':self.model_name,**self.env,'batch_size':len(conversations),
+                 'padding_side':'left','input_padding_excluded':True,'output_stopped_at_first_eos':True}))
+        return result
+
 
 def make_provider(config):
     return QwenProvider(config) if config["type"]=="transformers" else APIProvider(config)

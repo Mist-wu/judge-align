@@ -14,6 +14,7 @@ parser.add_argument('--data-archive',required=True)
 parser.add_argument('--requests',default='data/requests.jsonl')
 parser.add_argument('--session',default='exp-e4-qwen')
 parser.add_argument('--retry-unknown',action='store_true')
+parser.add_argument('--batch-size',type=int,default=1)
 args=parser.parse_args()
 root=Path.cwd();results=root/'results';results.mkdir(exist_ok=True)
 run_id=os.environ.get('EXPERIMENT_RUN_ID','E4-qwen-formal-001')
@@ -43,7 +44,10 @@ receipt['hardware']={'gpu':torch.cuda.get_device_name(),'gpu_memory_bytes':torch
 (results/'qwen-env.txt').write_text(subprocess.check_output([sys.executable,'-m','pip','freeze'],text=True))
 receipt.update(state='running');save()
 print(json.dumps(receipt),flush=True)
-command=[sys.executable,'scripts/run.py','run','--provider','qwen','--requests',args.requests,'--output','results/qwen.jsonl']
+if args.batch_size>1:
+    command=[sys.executable,'scripts/run_qwen_batch.py','--batch-size',str(args.batch_size),'--requests',args.requests,'--output','results/qwen.jsonl']
+else:
+    command=[sys.executable,'scripts/run.py','run','--provider','qwen','--requests',args.requests,'--output','results/qwen.jsonl']
 if args.retry_unknown:command.append('--retry-unknown')
 receipt['command']=command;receipt['requests_file']=args.requests;save()
 process=subprocess.Popen(command)
