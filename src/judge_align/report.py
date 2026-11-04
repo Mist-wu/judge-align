@@ -7,6 +7,7 @@ from .data import DIMENSIONS,validate_annotations
 from .io import atomic_json,digest,now,write_jsonl
 from .metrics import canonical_winner,cluster_ci,mean,partial_spearman,qwk,spearman
 from .selection import select_on_development
+from .prompts import prompt_for
 
 
 def heatmap_svg(pointwise,path):
@@ -135,7 +136,15 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds)
     atomic_json(out/'split-manifest.json',report['prompt_selection']['manifest'])
     atomic_json(out/'formal-summary.json',report)
-    write_jsonl(out/'disagreements.jsonl',sorted(badcases,key=lambda r:-r['absolute_error'])[:20])
+    by_case=defaultdict(list)
+    for row in badcases:by_case[row['case_id']].append(row)
+    worst=sorted(by_case,key=lambda cid:(-max(r['absolute_error'] for r in by_case[cid]),
+                                        -mean([r['absolute_error'] for r in by_case[cid]]),cid))[:20]
+    write_jsonl(out/'disagreements.jsonl',[
+        {'case_id':cid,'role':index[cid]['role'],'context':index[cid]['context'],
+         'response':index[cid]['response'],'source_rows':index[cid]['source_rows'],
+         'human_scores':references[cid],'judgments':by_case[cid],
+         'review_status':'awaiting_qualitative_analysis_not_new_human_annotation'} for cid in worst])
     heatmap_svg(pointwise,out/'kappa.svg')
     bias_svg([(r['provider']+'/'+r['dimension'],r['position_inconsistency']) for r in pairwise],out/'position-bias.svg','Canonical outcome inconsistency after swapping A/B; 95% cluster bootstrap CI')
     bias_svg([(r['provider']+'/'+r['style']+'/'+r['dimension'],r['length_partial_spearman']) for r in pointwise],out/'length-bias.svg','Length association after control for independent human quality; not causal')
@@ -156,6 +165,12 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
             'Contexts, including all styles and pair orientations, are kept together. The split was frozen after generation began but before inspecting aggregate rankings; this is exploratory, not preregistered.']
     if selection['state']=='complete':
         picked=selection['selected'];held=selection['held_out_test']
+        atomic_json(out/'selected-prompt.json',{
+            'provider':picked['provider'],'model':config['providers'][picked['provider']]['model'],
+            'style':picked['style'],'selection_metric':'Development Empathy QWK',
+            'held_out_test':held,'scope':selection['scope'],
+            'messages_template':prompt_for({'role':'{{role}}','profile':'{{profile}}',
+                'context':'{{context}}','response':'{{response}}'},picked['style'])})
         lines += ['',f"Selected only on development Empathy QWK: **{picked['provider']} / {picked['style']}** (development n={picked['n']}).",
                   f"Held-out test n={held['qwk']['n']}; QWK {interval(held['qwk'])}; Spearman {interval(held['spearman'])}.",
                   'This selection does not establish superiority on other dimensions or populations.']

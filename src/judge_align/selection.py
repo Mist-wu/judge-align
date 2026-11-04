@@ -1,5 +1,6 @@
 """Frozen context split for exploratory prompt selection, fixed before rankings."""
 import hashlib
+from collections import Counter
 from .metrics import cluster_ci, qwk, spearman
 
 
@@ -14,7 +15,11 @@ def select_on_development(cases, successful, providers, references, rounds=1000)
                 'timing': 'Fixed after requests started, before inspecting aggregate rankings; not a preregistration.',
                 'selection_rule': 'Highest development Empathy QWK; lexicographic provider/style breaks ties.',
                 'case_split': partition, 'context_counts': {'development': len(dev), 'test': len(contexts)-len(dev)},
-                'case_counts': {split: sum(value == split for value in partition.values()) for split in ('development', 'test')}}
+                'case_counts': {split: sum(value == split for value in partition.values()) for split in ('development', 'test')},
+                'source_empathy_distribution': {
+                    split:dict(sorted(Counter(references[case['id']]['empathy'] for case in primary
+                          if partition[case['id']]==split and 'empathy' in references[case['id']]).items()))
+                    for split in ('development','test')}}
     styles = ('direct', 'rationale', 'anchored')
     expected = len(primary)*len(providers)*len(styles)
     present = sum((provider, style, case['id'], False) in successful
