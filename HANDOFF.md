@@ -2,16 +2,20 @@
 
 ## Running now
 
-`exp-e4-apis.service` on `agent-01` runs Gemini **gemini-3.8-flash** and **deepseek-flash** in parallel as `exp-runner`. Each full queue contains 1,000 requests: 200 cases × 3 pointwise prompt styles plus 200 pairs × 2 orientations. Already successful records are reused. There is no request-count cap.
+`exp-e4-apis.service` on `agent-01` continues Gemini **gemini-3.8-flash** unchanged. The separate `exp-e4-deepseek.service` resumes **deepseek-flash** with 8192 output-token capacity. Both run as `exp-runner`. Each full queue contains 1,000 requests: 200 cases × 3 pointwise prompt styles plus 200 pairs × 2 orientations. Already successful records are reused. There is no request-count cap.
 
 - Working directory: `/srv/exp-runner/repos/judge-align`
-- Log: `logs/formal-api.log`
+- Logs: Gemini `logs/formal-api.log`; resumed DeepSeek `logs/formal-deepseek.log`
 - Results: `results/gemini.jsonl`, `results/deepseek.jsonl`
-- Campaign completion: `results/api-campaign.json` (written when both processes finish)
+- Receipts: original `results/api-campaign.json`; resumed DeepSeek `results/deepseek-campaign.json`. Original campaign may exit failed because its old DeepSeek child exited; inspect Gemini records and resumed DeepSeek independently.
 - CPU 25%, memory 256 MiB. The transient systemd unit survives SSH/Mac disconnection.
 - The campaign script reads provider credentials into subprocess environments; never print `/srv/exp-runner/secrets/providers.env`.
 
-Do not start a second copy while this unit is active. Observe with `systemctl show exp-e4-apis.service -p ActiveState -p SubState -p MemoryCurrent`; count `status=success` rows in each JSONL for progress.
+Do not duplicate either active provider. Refresh actual unit states and unique successful-request counts with `python3 scripts/progress.py`; snapshot is saved in `docs/formal-progress.json`. At **2026-11-04 21:01:40 JST**, Gemini had **175/1000** successful requests, DeepSeek **19/1000**, and all three earlier DeepSeek failed requests had been resolved. These are a timestamped progress snapshot, not completion.
+
+The requested-model and request-id pair determines whether a successful result is reused. The report records all observed provider config hashes and the 1536 → 8192 DeepSeek capacity change. Empty content now retains provider usage before being recorded as a failed parse.
+
+Stop both workers if requested: `sudo systemctl stop exp-e4-apis.service exp-e4-deepseek.service`. A future DeepSeek-only continuation uses `/usr/bin/python3 scripts/run_api_campaign.py --provider deepseek`; supervisor supplies exp-runner identity and the same service resource limits. Do not restart the Gemini unit merely to resume DeepSeek.
 
 ## Remaining work
 

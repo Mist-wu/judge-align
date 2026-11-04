@@ -1,6 +1,6 @@
 # E4 baselines and source boundaries
 
-Checked 2026-11-04. No formal judge requests have run in this checkout yet.
+Checked 2026-11-04. Formal API judging is running on AWS; current counts are recorded in the server snapshot `docs/formal-progress.json`.
 
 | Source | Published finding | How used here |
 |---|---|---|

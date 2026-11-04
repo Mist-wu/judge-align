@@ -54,13 +54,11 @@ class APIProvider:
             payload.update(cfg.get("request_options", {}))
             result = post(cfg["base_url"].rstrip("/")+"/chat/completions", payload,
                           {"Authorization":"Bearer "+self.key})
-            text = result["choices"][0]["message"].get("content")
-            if not text:
-                raise ProviderError("Provider returned no visible content")
+            text = result["choices"][0]["message"].get("content") or ""
             raw_usage = result.get("usage",{})
             usage = {"input_tokens":raw_usage.get("prompt_tokens"),"output_tokens":raw_usage.get("completion_tokens"),
                      "cached_input_tokens":raw_usage.get("prompt_cache_hit_tokens",0),"provider_usage":raw_usage}
-            return text, usage, {"model":result.get("model",self.model),"finish_reason":result["choices"][0].get("finish_reason")}
+            return text, usage, {"model":result.get("model",self.model),"finish_reason":result["choices"][0].get("finish_reason"),"max_output_tokens":payload["max_tokens"]}
         if cfg["type"] == "gemini":
             model = self.model.removeprefix("models/")
             url = cfg["base_url"].rstrip("/")+"/models/"+urllib.parse.quote(model,safe="")+":generateContent"

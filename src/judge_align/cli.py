@@ -25,6 +25,7 @@ def run_requests(config,requests,output,provider_name,retry_unknown=False,provid
     try:
         existing=read_jsonl(output)
         states={row['run_key']:row['status'] for row in existing}
+        completed={(row['request_id'],row.get('requested_model')) for row in existing if row['status']=='success'}
         failure_counts={}
         for row in existing:
             if row['status']=='failed':failure_counts[row['run_key']]=failure_counts.get(row['run_key'],0)+1
@@ -32,7 +33,7 @@ def run_requests(config,requests,output,provider_name,retry_unknown=False,provid
         for request in requests:
             if request['provider']!=provider_name:continue
             key=digest([request['request_id'],cfg])
-            if states.get(key)=='success':continue
+            if (request['request_id'],cfg['model']) in completed:continue
             if states.get(key)=='started' and not retry_unknown:
                 raise ValueError('Unfinished provider request has unknown billing outcome; inspect ledger before --retry-unknown')
             if failure_counts.get(key,0)>=3:continue

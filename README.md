@@ -8,7 +8,7 @@ Compare DeepSeek, Gemini and Qwen judges with actual human labels, preserving mi
 | Distinct same-context candidate pairs | 200 |
 | Planned judge requests, including both pair orders | 3,000 |
 
-**Formal metrics are pending; these counts are preparation results, not evidence of judge quality.** Formal Gemini 3.8-flash and DeepSeek flash scoring is running on AWS under `exp-e4-apis.service`. Existing successful records are reused. Other custom dimensions need human labels. API judges run on the server; Qwen runs only on an allocated CUDA Colab runtime, independent of the Mac.
+**Formal metrics are pending; these counts are preparation results, not evidence of judge quality.** Formal Gemini 3.8-flash scoring is running under `exp-e4-apis.service`; DeepSeek flash continues under `exp-e4-deepseek.service`. Existing successful records are reused. Other custom dimensions need human labels. API judges run on the server; Qwen runs only on an allocated CUDA Colab runtime, independent of the Mac.
 
 ## Prepare the full experiment
 
@@ -35,7 +35,9 @@ python3 scripts/run.py run --provider gemini --output results/gemini.jsonl
 
 There are 600 pointwise and 400 paired-orientation requests per provider. Three pointwise styles are direct, concise rationale before score, and fixed rubric anchors. The fourth style is pairwise preference. All styles evaluate four dimensions in one request. No judge reads human ratings.
 
-The runner uses an exclusive output-file lock. A request is durably recorded before submission, and successes are skipped after restart. An interrupted request with unknown billing outcome requires investigation before explicitly adding `--retry-unknown`. Provider/auth/network errors stop this provider rather than spending across the remaining queue; malformed replies are recorded and fail the command. At most three recorded failed attempts per request.
+DeepSeek output capacity is 8192 tokens; the first formal responses used 1536, which truncated reasoning-heavy replies. Complete earlier results are retained and failed requests are retried. Reports disclose the observed configuration hashes.
+
+The runner uses an exclusive output-file lock. A request is durably recorded before submission, and successful `(request_id, requested_model)` pairs are skipped after restart, including after output-capacity adjustment. Each raw result retains its provider configuration hash. An interrupted request with unknown billing outcome requires investigation before explicitly adding `--retry-unknown`. Provider/auth/network errors stop this provider rather than spending across the remaining queue; malformed replies are recorded and fail the command. At most three recorded failed attempts per request.
 
 ## Qwen on an already allocated Colab GPU
 

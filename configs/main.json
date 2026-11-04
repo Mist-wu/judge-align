@@ -9,7 +9,7 @@
       "base_url": "https://api.deepseek.com",
       "key_env": "DEEPSEEK_API_KEY",
       "model_env": "DEEPSEEK_MODEL",
-      "max_output_tokens": 1536,
+      "max_output_tokens": 8192,
       "pricing_usd_per_million": null,
       "model": "deepseek-flash"
     },

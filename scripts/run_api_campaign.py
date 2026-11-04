@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run both full API queues; inherited provider keys never appear in argv/logs."""
+import argparse
 import json
 import os
 from pathlib import Path
@@ -8,6 +9,10 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--provider", choices=["gemini", "deepseek"], action="append")
+args = parser.parse_args()
+providers = args.provider or ["gemini", "deepseek"]
 ROOT = Path(__file__).resolve().parents[1]
 env = os.environ.copy()
 for raw in Path('/srv/exp-runner/secrets/providers.env').read_text().splitlines():
@@ -23,7 +28,7 @@ for raw in Path('/srv/exp-runner/secrets/providers.env').read_text().splitlines(
 env['PYTHONUNBUFFERED'] = '1'
 started_at = datetime.now(timezone.utc).isoformat()
 processes = {}
-for provider in ['gemini', 'deepseek']:
+for provider in providers:
     command = [sys.executable, 'scripts/run.py', 'run', '--provider', provider,
                '--output', f'results/{provider}.jsonl']
     processes[provider] = subprocess.Popen(command, cwd=ROOT, env=env)
@@ -32,6 +37,7 @@ for provider in ['gemini', 'deepseek']:
 exit_codes = {provider: process.wait() for provider, process in processes.items()}
 record = {'started_at': started_at, 'ended_at': datetime.now(timezone.utc).isoformat(),
           'exit_codes': exit_codes, 'status': 'complete' if all(code == 0 for code in exit_codes.values()) else 'failed'}
-(ROOT/'results/api-campaign.json').write_text(json.dumps(record, indent=2)+'\n')
+receipt = 'api-campaign.json' if len(providers) > 1 else f'{providers[0]}-campaign.json'
+(ROOT/'results'/receipt).write_text(json.dumps(record, indent=2)+'\n')
 print(json.dumps(record), flush=True)
 raise SystemExit(0 if record['status'] == 'complete' else 1)
