@@ -63,7 +63,7 @@ python3 scripts/run.py report --judgments results/deepseek.jsonl results/gemini.
 python3 scripts/reconcile_cost.py
 ```
 
-Outputs are `results/formal-summary.json`, `report.md`, `kappa.svg` and `disagreements.jsonl`. QWK and Spearman use exact paired samples with 1,000 context-cluster bootstrap resamples. Position bias uses both pair orientations. Length partial Spearman stays unavailable until independent human quality scores exist. Unknown/undefined values are `null` rather than fabricated zeros. Pairwise preference agreement is separate from ordinal QWK.
+Outputs are `results/formal-summary.json`, `report.md`, `kappa.svg` and `disagreements.jsonl`. QWK and Spearman use exact paired samples with 1,000 conversation-group bootstrap resamples. Position bias uses both pair orientations. Length partial Spearman stays unavailable until independent human quality scores exist. Unknown/undefined values are `null` rather than fabricated zeros. Pairwise preference agreement is separate from ordinal QWK.
 
 The report records the actual completed-request count. Automated completion still leaves `human_pending`; it does not certify the whole experiment complete. Costs and token accounting are described in `docs/cost.md`.
 

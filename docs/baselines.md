@@ -21,8 +21,8 @@ Published Qwen-7B/Baichuan-7B responses supply 200 distinct, same-context altern
 
 - Three pointwise prompts produce 1–5 scores. Spearman uses average ranks for ties; QWK fixes rating categories at 1..5. Degenerate statistics are `null`, not zero.
 - Pairwise prompts return A/B/tie. Each pair is judged in both orders and mapped back to a canonical orientation. Report all-outcome inconsistency and decisive A/B flip rate separately. Pairwise results are not converted into fictional 1–5 scores.
-- Confidence intervals use 1,000 paired bootstrap resamples at **context** level, preserving duplicate cases/orders from the same context.
+- Confidence intervals use 1,000 paired bootstrap resamples at **dialogue-prefix group** level, preserving duplicate cases/orders from the same context.
 - Length is Unicode character count. Partial Spearman controls independently human-rated response quality; no length-bias conclusion is emitted while quality labels are absent. This association is not causal.
 - Human initial/retest QWK is descriptive reliability, not a mathematical upper bound for model agreement. Delayed retest requires a real person and cannot be completed on the first night.
 - No prompt selection on the final test set is presented as an unbiased superiority claim. The comparison is exploratory; confirmation needs a separately frozen set.
-- `docs/split-manifest.json` fixes 40 development and 160 test cases by context hash. It was committed after generation started but before aggregate rankings were inspected, and is not a preregistration. The development labels happen to contain no rating-5 example; the split was not changed after observing that imbalance.
+- `docs/split-manifest.json` fixes 39 development and 161 test cases by dialogue-prefix group hash. It was committed after generation started but before aggregate rankings were inspected, and is not a preregistration. Exact label distributions are recorded in the manifest; no label-based stratification or outcome-based split search was used. The initial context-only split had ten cross-split prefix pairs across roles and was revised before inspecting model/prompt aggregate rankings.

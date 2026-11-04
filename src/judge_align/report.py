@@ -6,7 +6,7 @@ from pathlib import Path
 from .data import DIMENSIONS,validate_annotations
 from .io import atomic_json,digest,now,write_jsonl
 from .metrics import canonical_winner,cluster_ci,mean,partial_spearman,qwk,spearman
-from .selection import select_on_development
+from .selection import select_on_development,conversation_groups
 from .prompts import prompt_for
 
 
@@ -38,6 +38,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     if annotations:
         validate_annotations(annotations,cases,pairs)
     index={c['id']:c for c in cases};pair_index={p['id']:p for p in pairs}
+    groups=conversation_groups(cases)
     references={c['id']:dict(c['human_scores']) for c in cases}
     pair_references={p['id']:dict(p['human_winners']) for p in pairs}
     manual=defaultdict(list);retest=defaultdict(dict)
@@ -77,7 +78,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                     row=successful.get((provider,style,c['id'],False))
                     gold=references[c['id']].get(dimension)
                     if row is None or gold is None:continue
-                    entry={'context_id':c['context_id'],'human':gold,'judge':row['result']['scores'][dimension],
+                    entry={'context_id':groups[c['id']],'human':gold,'judge':row['result']['scores'][dimension],
                            'length':len(c['response']),'quality':references[c['id']].get('quality')}
                     matched.append(entry)
                     badcases.append({'provider':provider,'style':style,'dimension':dimension,'case_id':c['id'],
@@ -98,7 +99,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                 a=canonical_winner(front['result']['winners'][dimension],False)
                 b=canonical_winner(back['result']['winners'][dimension],True)
                 gold=pair_references[pair['id']].get(dimension)
-                complete.append({'context_id':pair['context_id'],'inconsistent':int(a!=b),'decisive_flip':int(a!=b),
+                complete.append({'context_id':groups[pair['a_id']],'inconsistent':int(a!=b),'decisive_flip':int(a!=b),
                                  'decisive':a!='tie' and b!='tie','accuracy':None if gold is None else (int(a==gold)+int(b==gold))/2})
             labelled=[r for r in complete if r['accuracy'] is not None]
             decisive=[r for r in complete if r['decisive']]
@@ -108,7 +109,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                 'human_pair_accuracy':cluster_ci(labelled,lambda r:mean([x['accuracy'] for x in r]),rounds=rounds,seed=seed)})
     reliability=[]
     for dimension in DIMENSIONS:
-        matched=[{'context_id':index[cid]['context_id'],'initial':r['initial'][dimension],'retest':r['retest'][dimension]}
+        matched=[{'context_id':groups[cid],'initial':r['initial'][dimension],'retest':r['retest'][dimension]}
                  for (cid,annotator),r in retest.items() if 'initial' in r and 'retest' in r]
         reliability.append({'dimension':dimension,'qwk':cluster_ci(matched,lambda r:qwk([x['initial'] for x in r],[x['retest'] for x in r]),rounds=rounds,seed=seed)})
     primary=[c for c in cases if c['primary']]
@@ -116,6 +117,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     pending={d:sum(d not in references[c['id']] for c in primary) for d in DIMENSIONS}
     report={'run_kind':'formal','created_at':now(),'source_commit':primary[0].get('source_commit') if primary else None,
         'population':config.get('data_population'),'primary_count':len(primary),'pair_count':len(pairs),
+        'bootstrap_unit':'Dialogue-prefix connected component across roles; all response variants and pair orientations remain together',
         'successful_requests':len(successful),'expected_requests':expected,
         'failed_attempts':sum(row.get('status')=='failed' for row in judgments),
         'failed_request_configs':len(failed),
@@ -169,7 +171,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     for r in pairwise:lines.append(f"| {r['provider']} | {r['dimension']} | {r['position_inconsistency']['n']} | {interval(r['position_inconsistency'])} | {interval(r['decisive_flip_rate'])} |")
     selection=report['prompt_selection']
     lines+=['','## Development / held-out test split','',
-            'Contexts, including all styles and pair orientations, are kept together. The split was frozen after generation began but before inspecting aggregate rankings; this is exploratory, not preregistered.']
+            'Dialogue-prefix groups across roles, including all styles and pair orientations, are kept together. The split was corrected after case inspection to remove prefix overlap before inspecting model/prompt aggregate rankings; this is exploratory, not preregistered.']
     if selection['state']=='complete':
         picked=selection['selected'];held=selection['held_out_test']
         atomic_json(out/'selected-prompt.json',{
