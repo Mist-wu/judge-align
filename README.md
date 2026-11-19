@@ -1,102 +1,85 @@
-# 中文角色对话的 judge 与人工评分一致性
+# judge-align：LLM-as-a-Judge 和人工评分的一致性
 
-三类 judge 与 CharacterEval 已公开共情评分的一致性有限；本次结果不足以支持用模型评分替代人工标注。
+用大模型给中文角色对话打分时，分数和人工评分有多一致？换 judge 模型、换提示写法、交换候选顺序，结论会不会变？这个仓库在 CharacterEval 已公开的人工共情评分上测这几个问题。
 
-3,000 次原定请求已全部执行，2,970 条严格格式有效，加 1 条明确尾逗号恢复，共 2,971 条可分析；29 条格式失败保留缺失。按 2026-11-05 用户指定的“实验 + agent 审核”范围，状态为 `complete`。不再调用模型填补失败；新增真人标注和 48 小时重标为 `not_requested`。Qwen 已退出，A100 已于 11 月 4 日 23:29 交给 E2。完整记录见 `HANDOFF.md` 和 [审核来源](docs/agent-review.md)；`docs/formal-progress.json` 为当时执行快照。
+## 设置
 
-| Judge | 写法 | 有效 N | 共情 QWK [95% CI] | Spearman [95% CI] |
+- **数据**：CharacterEval 中 200 条带人工共情分的角色对话。按对话前缀的连通组划分开发集和测试集，同一段对话的不同角色或轮次不会分到两边。
+- **judge**：DeepSeek（`deepseek-flash`）、Gemini（`gemini-3.8-flash`）和本地 Qwen2.5-7B-Instruct（NF4 4-bit）。
+- **写法**：直接打分、先写理由再打分、按锚定量表打分。三种都在一次请求里给人设、共情、质量和安全四个维度打分。
+- **成对比较**：同一对候选正反顺序各问一次，看结论是否随位置改变。
+- **规模**：每个 judge 600 次单条打分 + 400 次成对比较，共 3,000 次请求，2,971 条可分析。
+- **统计**：QWK 和 Spearman，置信区间用 1,000 次按对话组重采样的 bootstrap。
+
+## 结果
+
+**共情维度和人工评分的一致性：**
+
+| Judge | 写法 | 有效 N | QWK [95% CI] | Spearman [95% CI] |
 |---|---|---:|---:|---:|
-| deepseek | direct | 200 | 0.184 [0.060, 0.296] | 0.199 [0.062, 0.329] |
-| deepseek | rationale | 200 | 0.250 [0.110, 0.365] | 0.262 [0.117, 0.390] |
-| deepseek | anchored | 200 | 0.127 [0.006, 0.250] | 0.135 [-0.002, 0.271] |
-| gemini | direct | 200 | 0.185 [0.071, 0.299] | 0.207 [0.073, 0.333] |
-| gemini | rationale | 200 | 0.175 [0.074, 0.278] | 0.200 [0.067, 0.330] |
-| gemini | anchored | 200 | 0.157 [0.060, 0.258] | 0.170 [0.042, 0.287] |
-| qwen | direct | 198 | 0.097 [0.005, 0.187] | 0.135 [0.005, 0.260] |
-| qwen | rationale | 196 | 0.140 [0.025, 0.248] | 0.185 [0.043, 0.318] |
-| qwen | anchored | 199 | 0.126 [-0.011, 0.240] | 0.114 [-0.027, 0.239] |
+| DeepSeek | 直接打分 | 200 | 0.184 [0.060, 0.296] | 0.199 [0.062, 0.329] |
+| DeepSeek | 先写理由 | 200 | **0.250** [0.110, 0.365] | 0.262 [0.117, 0.390] |
+| DeepSeek | 锚定量表 | 200 | 0.127 [0.006, 0.250] | 0.135 [-0.002, 0.271] |
+| Gemini | 直接打分 | 200 | 0.185 [0.071, 0.299] | 0.207 [0.073, 0.333] |
+| Gemini | 先写理由 | 200 | 0.175 [0.074, 0.278] | 0.200 [0.067, 0.330] |
+| Gemini | 锚定量表 | 200 | 0.157 [0.060, 0.258] | 0.170 [0.042, 0.287] |
+| Qwen | 直接打分 | 198 | 0.097 [0.005, 0.187] | 0.135 [0.005, 0.260] |
+| Qwen | 先写理由 | 196 | 0.140 [0.025, 0.248] | 0.185 [0.043, 0.318] |
+| Qwen | 锚定量表 | 199 | 0.126 [-0.011, 0.240] | 0.114 [-0.027, 0.239] |
 
-- 九组 QWK 点估计为 **0.097–0.250**，置信区间大量重叠，不据此宣称某个 judge 优于其他模型。
-- 按固定开发集选择 **qwen / anchored**；公平比较使用全部写法共同有效的 **193** 条样本。独立测试 n=157，QWK **0.125 [-0.016, 0.253]**，区间包含零。该提示只作为开发集选出的候选保存，不宣称已验证为可靠 judge。
-- 原始共情真人标注覆盖 **200** 条并原样保留。独立 agent 审核覆盖 **200** 条 persona/quality/safety 和 **200** 对四维偏好；2 个评分为空、10 个偏好维度不确定，合计涉及 34 个需保留上下文或角色不确定性的场景。agent 审核不进入现有 QWK、人类偏好准确率或重标可靠性。
-- `agent_review_complete=true`，`human_validation_complete=false`，`human_validation_required=false`；新增真人标注和 50 条 48 小时重标均为 `not_requested`。缺失真人标签保持为空，相应统计保持不可计算。
+九组 QWK 在 0.097～0.250 之间，属于弱一致，置信区间大量重叠。用模型分直接替代人工共情标注，目前证据不够。
 
-开发/测试按对话前缀连通组划分为 39/161 条；不能把同一对话的不同角色或不同轮次分到两边。193 条共同有效样本中实际开发/测试为 36/157。划分修正、原始格式有效率、重试与尾逗号恢复均在报告中披露；没有按结果重新调提示或修改人工原分。
+**交换候选顺序后，结论改变的比例：**
 
-所有置信区间使用 1,000 次对话组 bootstrap。公开 reward-model 训练数据可能受基座模型污染，自定义共情锚点也并非原标注说明的逐字复制，因此不应把分歧直接解释为人工或模型一方必然错误。
-
-位置交换后的同一候选结论不一致率如下（含平局变化；不是人工正确率）：
-
-| Judge | 完整双向 N | 人设 | 共情 | 质量 | 安全 |
+| Judge | 有效对数 | 人设 | 共情 | 质量 | 安全 |
 |---|---:|---:|---:|---:|---:|
-| deepseek | 200 | 27.0% | 31.0% | 26.0% | 5.5% |
-| gemini | 192 | 9.9% | 25.0% | 8.3% | 0.0% |
-| qwen | 187 | 50.3% | 52.9% | 46.0% | 46.5% |
+| DeepSeek | 200 | 27.0% | 31.0% | 26.0% | 5.5% |
+| Gemini | 192 | 9.9% | 25.0% | 8.3% | 0.0% |
+| Qwen | 187 | 50.3% | 52.9% | 46.0% | 46.5% |
 
-原始首次格式有效率：DeepSeek 99.5%、Gemini 97.7%、Qwen 97.9%。API 额外尝试分别为 5 和 16 次，未删除失败账本；Qwen 没有重跑任何已有终态请求，仅恢复运行中丢失的 1 条。位置不一致率以各模型有效双向样本计算，分母不同、人工偏好缺失，不能直接解读为准确率排名；Gemini 安全维度只有 1 对双向非平局，零变化不能证明区分能力。完整区间和执行变更见报告。
+Qwen 约一半的判断会随位置改变，Gemini 最稳定。
 
-![实际统计图](figures/formal-comparison.png)
+**开发集选出的提示能不能泛化：** 在开发集上按 QWK 选出的组合，到测试集（n = 157）上 QWK 降到 0.125 [-0.016, 0.253]。只在开发集上调提示，选出来的评审方案不一定可靠，需要留出集验证。
 
-已知 API 用量公开价估算 **$3.57763116**，另有 1 笔原始 DeepSeek 失败用量未知；Colab CU 单独记录，不把共享 GPU 重复计费。见 [成本记录](docs/cost.md)。最终合并原始账本在 `results/final-delivery/`；服务器原 API 账本保持原样。
+![各组合的 QWK 对比](figures/formal-comparison.png)
 
-逐条解释见 [20 个分歧案例](docs/disagreement-analysis.md)，统计见 [正式报告](results/report.md)，开发集候选提示见 [selected-prompt.json](results/selected-prompt.json)。这些案例解释来自 Codex 分析，不是新人工标注。
-## Prepare the full experiment
+分歧最大的 20 个案例逐条分析见 [disagreement-analysis.md](docs/disagreement-analysis.md)。常见原因是把角色自身的情绪表达、互动自然或任务追问当成了共情。完整统计见 [正式报告](results/report.md)。
 
-Python 3.11+ suffices; the API and analysis paths have no third-party dependencies.
+## 工程细节
+
+- 请求在发送前先落盘，重启后跳过已成功的请求，不重复计费。输出文件加排他锁。
+- 鉴权、网络等错误会让当前 provider 停下，不继续消耗剩下的队列。每条请求最多记录 3 次失败。
+- 格式失败、截断和重试全部保留在账本里，不静默丢样本。
+- Qwen 拒绝超长输入，不静默截断。
+- API 按公开价估算总花费 3.58 美元，逐项见 [cost.md](docs/cost.md)。
+
+## 运行
+
+需要 Python 3.11 以上，API 和分析部分没有第三方依赖。API key 通过环境变量 `DEEPSEEK_API_KEY` 和 `GEMINI_API_KEY` 传入。
 
 ```bash
 python3 scripts/run.py prepare --fetch
 python3 scripts/run.py requests
-```
-
-The source is pinned and downloaded under ignored `data/raw/`; source hashes are in `docs/data-source-manifest.json`. Re-running preparation is deterministic. The generated primary cases, alternatives, pairs and prompts remain outside Git. Historical annotation templates are preserved unchanged; creating new human annotations or delayed retests is outside the agreed scope. See `docs/baselines.md` for the real source schema and limitations.
-
-## Run API judges
-
-Supply `DEEPSEEK_API_KEY` and `GEMINI_API_KEY` through the environment, never CLI arguments or tracked files. Frozen defaults are `deepseek-flash` and `gemini-3.8-flash`; change `configs/main.json` only before a new run. These are independent from the Codex subscription used by the coding agent. API default URLs use official services. `model_env` is a fallback when `model` is removed from the provider configuration.
-
-```bash
-# Fresh campaign example only. The delivered campaign is finished; do not rerun it.
 python3 scripts/run.py run --provider deepseek --output results/deepseek.jsonl
 python3 scripts/run.py run --provider gemini --output results/gemini.jsonl
 ```
 
-There are 600 pointwise and 400 paired-orientation requests per provider. Three pointwise styles are direct, concise rationale before score, and fixed rubric anchors. The fourth style is pairwise preference. All styles evaluate four dimensions in one request. No judge reads human ratings.
-
-DeepSeek output capacity is 8192 tokens; the first formal responses used 1536, which truncated reasoning-heavy replies. Complete earlier results were retained during that continuation; further format-invalid outputs are now retained as results and must not be regenerated merely to reach 100% validity. Reports disclose the observed configuration hashes.
-
-Gemini's original worker also uses 1536. After a real pairwise reply reached `MAX_TOKENS` with 1470 thinking tokens, the continuation configuration was raised to 8192 for missing requests only. Both original API workers have now ended; successful outputs remain unchanged. Repeated malformed pairwise JSON is resumed with `configs/gemini-pairwise-continuation.json`, which adds the official `responseJsonSchema` constraint for the already-required winners/reasons fields. It is used only with pairwise request subsets, keeps the original prompts and parses the whole JSON strictly. These format-control changes remain visible in raw configuration hashes and report metadata. See [Gemini structured output](https://aistudio.google.com/docs/structured-output).
-
-The runner uses an exclusive output-file lock. A request is durably recorded before submission, and successful `(request_id, requested_model)` pairs are skipped after restart, including after output-capacity adjustment. Each raw result retains its provider configuration hash. An interrupted request with unknown billing outcome requires investigation before explicitly adding `--retry-unknown`. Provider/auth/network errors stop this provider rather than spending across the remaining queue; malformed replies are recorded and fail the command. At most three recorded failed attempts per request.
-
-## Qwen on an already allocated Colab GPU
-
-Do not run this on the 2 GB Lightsail host. Root owns session allocation and cleanup.
+Qwen 需要 GPU（L4 或 A100）：
 
 ```bash
 python -m pip install -e '.[qwen]'
 python scripts/run.py run --provider qwen --output results/qwen.jsonl
 ```
 
-`Qwen/Qwen2.5-7B-Instruct` is pinned to commit `a09a35458c702b33eeacc393d103063234e8bc28`, uses NF4 4-bit loading and BF16 compute on L4/A100. This differs from the original document's MLX quantization backend and is recorded explicitly. It rejects overlength inputs instead of silently truncating; Installed dependency versions were checked on PyPI. Run the full Qwen queue on the allocated GPU and record its actual runtime environment.
-
-## Agent review and report
-
-The user chose agent review on 2026-11-05 and explicitly excluded new human annotation and delayed human retest. The completed review is archived separately in `results/agent-review/`, with provenance and limitations in [docs/agent-review.md](docs/agent-review.md). `docs/completion-scope.json` records the scope and reviewed input hashes, independently of the frozen model configuration.
+生成报告和成本汇总：
 
 ```bash
-python3 scripts/run.py report --judgments results/final-delivery/deepseek.jsonl results/final-delivery/gemini.jsonl results/final-delivery/qwen.jsonl
+python3 scripts/run.py report --judgments results/final-delivery/deepseek.jsonl \
+  results/final-delivery/gemini.jsonl results/final-delivery/qwen.jsonl
 python3 scripts/reconcile_cost.py --results results/final-delivery
 ```
 
-Do not pass agent review files through `--human`. Existing released CharacterEval Empathy scores remain unchanged; all other human fields stay empty. The archived agent review is not used as human gold or added to the existing formal scores. Missing reference context, role/version and timepoint information remains uncertainty, not a completed human adjudication.
+## 来源
 
-Outputs are `results/formal-summary.json`, `report.md`, `kappa.svg` and `disagreements.jsonl`. QWK and Spearman use exact paired samples with 1,000 conversation-group bootstrap resamples. Position bias uses both pair orientations. Length adjustment, human pairwise accuracy and delayed human retest reliability remain unavailable without independent human labels; this absence does not block completion in the agreed scope. Unknown/undefined values remain `null`.
-
-The report preserves 3,000 terminal original requests, 2,971 analyzable outputs and 29 format-invalid outputs. It records `status=complete`, `agent_review_complete=true`, `human_validation_complete=false` and `human_validation_required=false` for these reviewed inputs. Rebuilding the same report retains this scope without model calls or new human work. Costs and token accounting are described in `docs/cost.md`.
-
-## Sources
-
-- [CharacterEval repository and MIT license](https://github.com/morecry/CharacterEval/tree/c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c), [paper](https://aclanthology.org/2024.acl-long.638/)
-- [MT-Bench / Chatbot Arena](https://arxiv.org/abs/2306.05685v4), [G-Eval](https://arxiv.org/abs/2303.16634v3)
-- [DeepSeek API](https://api-docs.deepseek.com/api/create-chat-completion/), [Gemini API](https://ai.google.dev/api/generate-content), [Qwen model card](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
+- [CharacterEval](https://github.com/morecry/CharacterEval/tree/c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c)（MIT 许可，[论文](https://aclanthology.org/2024.acl-long.638/)）
+- [MT-Bench / Chatbot Arena](https://arxiv.org/abs/2306.05685v4)、[G-Eval](https://arxiv.org/abs/2303.16634v3)
