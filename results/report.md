@@ -101,7 +101,7 @@ Agent review complete: **True**. New human annotation and delayed human retest: 
 
 Separate agent review covers 200 pointwise cases (persona/quality/safety) and 200 pairs (four dimensions). 2 pointwise scores remain null; 10 pairwise dimensions remain uncertain across 34 flagged contexts. These uncertainties remain disclosed, not required human tasks.
 
-Reviewers lacked some reference context and role/version/timepoint information. Agent ratings are not human gold and do not enter QWK, pairwise human accuracy, length adjustment or human retest reliability. Existing released CharacterEval Empathy labels remain the only human reference used here. See [review provenance](../docs/agent-review.md).
+Reviewers lacked some reference context and role/version/timepoint information. Agent ratings are not human gold and do not enter QWK, pairwise human accuracy, length adjustment or human retest reliability. Existing released CharacterEval Empathy labels remain the only human reference used here. See [completion scope](../docs/completion-scope.json).
 
 Missing custom human scores (data absence, not pending work): {"persona": 200, "empathy": 0, "quality": 200, "safety": 200}
 Missing human pair preferences: {"persona": 200, "empathy": 200, "quality": 200, "safety": 200}

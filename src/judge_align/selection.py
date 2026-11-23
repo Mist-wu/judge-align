@@ -22,7 +22,7 @@ def conversation_groups(cases):
     return {case['id']:find(case['context_id']) for case in cases}
 
 
-def select_on_development(cases, successful, providers, references, rounds=1000, attempted=None):
+def select_on_development(cases, successful, providers, references, rounds=1000, attempted=None, seed=42):
     primary = [case for case in cases if case['primary']]
     groups=conversation_groups(cases)
     contexts = sorted({groups[case['id']] for case in primary},
@@ -77,12 +77,19 @@ def select_on_development(cases, successful, providers, references, rounds=1000,
             development.append({'provider': provider, 'style': style, 'n': len(rows),
                                 'qwk': agreement(rows, qwk)})
     eligible = [row for row in development if row['qwk'] is not None]
+    scope = 'Exploratory Empathy prompt choice on cases valid under every judge/style. Format failures may make this subset unrepresentative; no universal or causal superiority claim.'
+    excluded = sorted(case['id'] for case in primary if case['id'] not in common)
+    if not eligible:
+        return {'state': 'no_valid_development_qwk', 'manifest': manifest, 'development': development,
+                'common_valid_case_count': len(common),
+                'excluded_cases_for_incomplete_judgments': excluded,
+                'selected': None, 'held_out_test': None, 'scope': scope}
     chosen = sorted(eligible, key=lambda row: (-row['qwk'], row['provider'], row['style']))[0]
     test_rows = matched(chosen['provider'], chosen['style'], 'test')
     return {'state': 'complete', 'manifest': manifest, 'development': development,
-            'common_valid_case_count':len(common),
-            'excluded_cases_for_incomplete_judgments':sorted(case['id'] for case in primary if case['id'] not in common),
+            'common_valid_case_count': len(common),
+            'excluded_cases_for_incomplete_judgments': excluded,
             'selected': chosen, 'held_out_test': {
-                'qwk': cluster_ci(test_rows, lambda rows: agreement(rows, qwk), rounds=rounds, seed=42),
-                'spearman': cluster_ci(test_rows, lambda rows: agreement(rows, spearman), rounds=rounds, seed=42)},
-            'scope': 'Exploratory Empathy prompt choice on cases valid under every judge/style. Format failures may make this subset unrepresentative; no universal or causal superiority claim.'}
+                'qwk': cluster_ci(test_rows, lambda rows: agreement(rows, qwk), rounds=rounds, seed=seed),
+                'spearman': cluster_ci(test_rows, lambda rows: agreement(rows, spearman), rounds=rounds, seed=seed)},
+            'scope': scope}

@@ -1,4 +1,5 @@
 """Explicit providers; errors never include headers, API keys, or response bodies."""
+import http.client
 import json
 import os
 import time
@@ -11,6 +12,11 @@ class ProviderError(RuntimeError):
     pass
 
 
+class UnknownBillingError(ProviderError):
+    """Transport or response-stream failure whose billing outcome is unknown."""
+    pass
+
+
 def resolve_model(config):
     model = config.get("model") or os.environ.get(config.get("model_env", ""))
     if not model:
@@ -18,23 +24,33 @@ def resolve_model(config):
     return model
 
 
-def post(url, body, headers, timeout=180):
+def post(url, body, headers, timeout=180, retry_rejected=False):
+    """POST JSON once unless the provider documents an unbilled rejection.
+
+    Server errors and HTTP 408 may follow execution, so they stay unresolved.
+    HTTP 429 is sent again only when retry_rejected is true. Connection and
+    timeout failures stay unknown and are not sent again here.
+    """
     request = urllib.request.Request(url, data=json.dumps(body).encode(),
                                      headers={"Content-Type":"application/json", **headers})
-    # A timed-out POST may already be billed. Retry only explicit HTTP retryable
-    # responses here; ambiguous connection/timeouts are persisted by the runner.
-    for attempt in range(3):
+    tries = 3 if retry_rejected else 1
+    for attempt in range(tries):
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 return json.load(response)
         except urllib.error.HTTPError as exc:
             code = exc.code
-            if code in {429,500,502,503,504} and attempt < 2:
+            exc.close()
+            if code == 429 and attempt + 1 < tries:
                 time.sleep(2**(attempt+1))
                 continue
+            if 500 <= code < 600 or code == 408 or (code == 429 and not retry_rejected):
+                raise UnknownBillingError(f"Provider HTTP {code}; billing outcome unknown") from None
             raise ProviderError(f"Provider HTTP {code}; response body withheld") from None
-        except (urllib.error.URLError, TimeoutError):
-            raise ProviderError("Provider transport error; billing outcome unknown") from None
+        except (urllib.error.URLError, TimeoutError, http.client.HTTPException, OSError):
+            raise UnknownBillingError("Provider transport error; billing outcome unknown") from None
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            raise UnknownBillingError("Provider returned non-JSON HTTP response; billing outcome unknown") from None
     raise AssertionError("unreachable")
 
 
@@ -53,12 +69,16 @@ class APIProvider:
                        "max_tokens":cfg.get("max_output_tokens",1536),"response_format":{"type":"json_object"}}
             payload.update(cfg.get("request_options", {}))
             result = post(cfg["base_url"].rstrip("/")+"/chat/completions", payload,
-                          {"Authorization":"Bearer "+self.key})
-            text = result["choices"][0]["message"].get("content") or ""
+                          {"Authorization":"Bearer "+self.key},
+                          retry_rejected=cfg.get("retry_unbilled_rejection") is True)
+            choices = result.get("choices") or []
+            if not choices or not isinstance(choices[0], dict):
+                raise ProviderError("OpenAI-compatible provider returned no choices")
+            text = (choices[0].get("message") or {}).get("content") or ""
             raw_usage = result.get("usage",{})
             usage = {"input_tokens":raw_usage.get("prompt_tokens"),"output_tokens":raw_usage.get("completion_tokens"),
                      "cached_input_tokens":raw_usage.get("prompt_cache_hit_tokens",0),"provider_usage":raw_usage}
-            return text, usage, {"model":result.get("model",self.model),"finish_reason":result["choices"][0].get("finish_reason"),"max_output_tokens":payload["max_tokens"]}
+            return text, usage, {"model":result.get("model",self.model),"finish_reason":choices[0].get("finish_reason"),"max_output_tokens":payload["max_tokens"]}
         if cfg["type"] == "gemini":
             model = self.model.removeprefix("models/")
             url = cfg["base_url"].rstrip("/")+"/models/"+urllib.parse.quote(model,safe="")+":generateContent"
@@ -67,7 +87,8 @@ class APIProvider:
                 "generationConfig":{"temperature":0,"maxOutputTokens":cfg.get("max_output_tokens",1536),"responseMimeType":"application/json"}}
             if cfg.get('response_json_schema'):
                 payload['generationConfig']['responseJsonSchema']=cfg['response_json_schema']
-            result = post(url,payload,{"x-goog-api-key":self.key})
+            result = post(url,payload,{"x-goog-api-key":self.key},
+                          retry_rejected=cfg.get("retry_unbilled_rejection") is True)
             candidates = result.get("candidates",[])
             if not candidates:
                 raise ProviderError("Gemini returned no candidate (possibly safety filtered)")
@@ -88,7 +109,7 @@ class QwenProvider:
         import torch
         from transformers import AutoTokenizer,AutoModelForCausalLM,BitsAndBytesConfig
         if not torch.cuda.is_available():
-            raise ProviderError("Qwen execution requires CUDA; run on allocated Colab GPU, not agent-01")
+            raise ProviderError("Qwen execution requires CUDA")
         self.config=config
         self.model_name=resolve_model(config)
         self.tokenizer=AutoTokenizer.from_pretrained(self.model_name,revision=config.get("revision","main"))
@@ -146,5 +167,7 @@ def estimated_cost(usage,config):
     if not price or usage.get("input_tokens") is None or usage.get("output_tokens") is None:
         return None
     cached=usage.get("cached_input_tokens",0) or 0
+    if cached < 0 or cached > usage["input_tokens"]:
+        return None
     output=usage["output_tokens"]+(usage.get("thought_tokens",0) or 0)
     return ((usage["input_tokens"]-cached)*price["input"]+cached*price.get("cached_input",price["input"])+output*price["output"])/1_000_000

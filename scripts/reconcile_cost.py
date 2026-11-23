@@ -5,6 +5,9 @@ from collections import Counter
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+from judge_align.ledger import ambiguous_inflight_attempts
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--results', default='results')
@@ -12,27 +15,28 @@ args = parser.parse_args()
 root = Path(args.results)
 providers = {}
 for name in ('deepseek', 'gemini'):
-    rows = [json.loads(line) for line in (root / f'{name}.jsonl').read_text().splitlines()]
+    rows = [json.loads(line) for line in (root / f'{name}.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
     totals = Counter()
-    states = {}
     estimate = 0.0
     unknown = 0
     for row in rows:
-        states[row['run_key']] = row['status']
         if row['status'] not in ('success', 'failed') or row.get('record_type')=='format_recovery':
             continue
         totals['terminal_attempts'] += 1
         totals[row['status'] + '_attempts'] += 1
         usage = row.get('usage') or {}
-        if 'input_tokens' not in usage or 'output_tokens' not in usage:
+        prompt = usage.get('input_tokens')
+        output = usage.get('output_tokens')
+        if prompt is None or output is None:
             unknown += 1
             continue
-        prompt = usage['input_tokens']
-        output = usage['output_tokens']
-        cached = usage.get('cached_input_tokens', 0)
-        thoughts = usage.get('thought_tokens', 0)
+        cached = usage.get('cached_input_tokens') or 0
+        thoughts = usage.get('thought_tokens') or 0
         totals.update(input_tokens=prompt, output_tokens=output,
                       cached_input_tokens=cached, additional_thinking_tokens=thoughts)
+        if cached < 0 or cached > prompt:
+            unknown += 1
+            continue
         ended = datetime.fromisoformat(row['ended_at'].replace('Z', '+00:00'))
         # All actual campaign calls occur after the published weekday peak window.
         # This historical reconciliation deliberately does not guess future prices.
@@ -48,7 +52,7 @@ for name in ('deepseek', 'gemini'):
             unknown += 1
     providers[name] = {**totals, 'estimated_paid_list_usd': round(estimate, 8),
                        'unknown_cost_terminal_attempts': unknown,
-                       'currently_inflight_attempts': sum(s == 'started' for s in states.values())}
+                       'currently_inflight_attempts': ambiguous_inflight_attempts(rows)}
 report = {
     'created_at': datetime.now(timezone.utc).isoformat(),
     'pricing_verified_at': '2026-11-04',

@@ -7,12 +7,27 @@ from .data import DIMENSIONS,validate_annotations
 from .io import atomic_json,digest,now,write_jsonl
 from .metrics import canonical_winner,cluster_ci,mean,partial_spearman,qwk,spearman
 from .selection import select_on_development,conversation_groups
-from .prompts import prompt_for
+from .ledger import ambiguous_inflight_attempts
+from .prompts import make_requests,prompt_for
 
 
 def apply_completion_scope(report,pairs):
     """Apply the recorded user scope without importing agent ratings as human gold."""
-    scope=json.loads((Path(__file__).resolve().parents[2]/'docs/completion-scope.json').read_text())
+    scope_path=Path(__file__).resolve().parents[2]/'docs/completion-scope.json'
+    if not scope_path.exists():
+        report.update({
+            'completion_scope':'automated_only',
+            'scope_decision_date':None,
+            'agent_review_complete':False,
+            'human_validation_complete':False,
+            'human_validation_required':False,
+            'human_annotation_status':'not_configured',
+            'delayed_human_retest_status':'not_configured',
+            'agent_review':None,
+            'status':report['automated_status'],
+        })
+        return report
+    scope=json.loads(scope_path.read_text(encoding='utf-8'))
     reviewed=report['data_sha256']==scope['data_sha256'] and digest(pairs)==scope['pairs_sha256']
     report.update({
         'completion_scope':scope['completion_scope'],
@@ -29,14 +44,31 @@ def apply_completion_scope(report,pairs):
 
 
 def review_scope_lines(report):
-    review=report['agent_review']
+    review=report.get('agent_review')
+    if not review:
+        return ['## Review scope and missing human measurements','',
+            'Missing custom human scores: '+json.dumps(report['human_labels_missing'],ensure_ascii=False),
+            'Missing human pair preferences: '+json.dumps(report['pairwise_human_labels_missing'],ensure_ascii=False),
+            f"Unperformed human delayed retests: {max(0,report['human_retest_missing'])}."]
+    decision_date=report.get('scope_decision_date') or 'recorded'
     return ['## Review scope and missing human measurements','',
-        f"Agent review complete: **{report['agent_review_complete']}**. New human annotation and delayed human retest: **not_requested** per the 2026-11-05 user instruction.",'',
+        f"Agent review complete: **{report['agent_review_complete']}**. New human annotation and delayed human retest: **not_requested** per the {decision_date} user instruction.",'',
         f"Separate agent review covers {review['pointwise_cases']} pointwise cases (persona/quality/safety) and {review['pairwise_pairs']} pairs (four dimensions). {review['null_pointwise_scores']} pointwise scores remain null; {review['uncertain_pairwise_dimensions']} pairwise dimensions remain uncertain across {review['uncertain_distinct_contexts']} flagged contexts. These uncertainties remain disclosed, not required human tasks.",'',
-        'Reviewers lacked some reference context and role/version/timepoint information. Agent ratings are not human gold and do not enter QWK, pairwise human accuracy, length adjustment or human retest reliability. Existing released CharacterEval Empathy labels remain the only human reference used here. See [review provenance](../docs/agent-review.md).','',
+        'Reviewers lacked some reference context and role/version/timepoint information. Agent ratings are not human gold and do not enter QWK, pairwise human accuracy, length adjustment or human retest reliability. Existing released CharacterEval Empathy labels remain the only human reference used here. See [completion scope](../docs/completion-scope.json).','',
         'Missing custom human scores (data absence, not pending work): '+json.dumps(report['human_labels_missing'],ensure_ascii=False),
         'Missing human pair preferences: '+json.dumps(report['pairwise_human_labels_missing'],ensure_ascii=False),
         f"Unperformed human delayed retests: {max(0,report['human_retest_missing'])}. Human validation complete: **false**; required in the agreed scope: **false**."]
+
+
+def _kappa_color(value):
+    """Blank when undefined; red below zero so negative agreement is not drawn as zero."""
+    if value is None:
+        return '#eeeeee'
+    bounded = max(-1.0, min(1.0, float(value)))
+    if bounded >= 0:
+        return f'rgb({int(235-80*bounded)},{int(235-20*bounded)},235)'
+    strength = -bounded
+    return f'rgb(235,{int(235-90*strength)},{int(235-90*strength)})'
 
 
 def heatmap_svg(pointwise,path):
@@ -56,7 +88,7 @@ def heatmap_svg(pointwise,path):
             row=index.get((provider,style,dimension),{})
             value=row.get('qwk',{}).get('value')
             label='N/A' if value is None else f'{value:.3f}'
-            color='#eeeeee' if value is None else f'rgb({int(220-130*max(0,value))},{int(230-40*max(0,value))},240)'
+            color=_kappa_color(value)
             nodes.append(f'<rect x="{225+110*i}" y="{y}" width="105" height="40" fill="{color}"/><text x="{235+110*i}" y="{y+25}" font-family="sans-serif" font-size="13">{label}</text>')
     nodes.append('</svg>')
     Path(path).write_text('\n'.join(nodes))
@@ -66,6 +98,12 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
     out=Path(outdir);out.mkdir(parents=True,exist_ok=True)
     if annotations:
         validate_annotations(annotations,cases,pairs)
+    scheduled_ids={request['request_id'] for request in make_requests(cases,pairs,config['providers'])}
+    terminal_ids={row['request_id'] for row in judgments if row.get('status') in {'success','failed'} and row.get('request_id')}
+    foreign=terminal_ids-scheduled_ids
+    if foreign:
+        noun='request id' if len(foreign)==1 else 'request ids'
+        raise ValueError(f'Ledger contains {len(foreign)} {noun} outside the scheduled plan')
     index={c['id']:c for c in cases};pair_index={p['id']:p for p in pairs}
     groups=conversation_groups(cases)
     references={c['id']:dict(c['human_scores']) for c in cases}
@@ -152,7 +190,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         terminal=[row for row in judgments if row.get('provider')==provider
                   and row.get('status') in {'success','failed'} and row.get('record_type')!='format_recovery']
         first={}
-        for row in sorted(terminal,key=lambda row:row['ended_at']):first.setdefault(row['request_id'],row)
+        for row in sorted(terminal,key=lambda row:row.get('ended_at','')):first.setdefault(row['request_id'],row)
         format_outcomes[provider]={'first_attempt_successes':sum(row['status']=='success' for row in first.values()),
             'first_attempt_failures':sum(row['status']=='failed' for row in first.values()),
             'terminal_inference_attempts':len(terminal),'retry_attempts':len(terminal)-len(first),
@@ -167,10 +205,10 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         'format_outcomes':format_outcomes,
         'failed_attempts':sum(row.get('status')=='failed' for row in judgments),
         'failed_request_configs':len(failed),
-        'automated_status':'complete' if len(attempted)==expected and len(primary)==config['sample_count'] and len(pairs)==config['sample_count'] else 'partial',
+        'automated_status':'complete' if terminal_ids==scheduled_ids and len(primary)==config['sample_count'] and len(pairs)==config['sample_count'] else 'partial',
         'completion_basis':'Every scheduled request has a terminal outcome; invalid model responses remain measured format failures, not fabricated scores.',
         'human_labels_missing':pending,'pairwise_human_labels_missing':{d:sum(d not in pair_references[p['id']] for p in pairs) for d in DIMENSIONS},
-        'human_retest_missing':50-sum('initial' in r and 'retest' in r for r in retest.values()),
+        'human_retest_missing':max(0, 50-sum('initial' in r and 'retest' in r for r in retest.values())),
         'pointwise':pointwise,'pairwise':pairwise,'human_reliability':reliability,
         'config_sha256':digest(config),'data_sha256':digest(cases),'judgments_sha256':digest(judgments),
         'observed_provider_config_hashes':{k:sorted(v) for k,v in provider_configs.items()},
@@ -178,7 +216,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                              for provider in ['deepseek','gemini'] if len(provider_configs[provider])>1],
         'cost':{'known_estimated_usd':sum(r.get('estimated_cost_usd') or 0 for r in judgments if r.get('status') in {'success','failed'}),
                 'unknown_pricing_terminal_attempts':sum(r.get('estimated_cost_usd') is None for r in judgments if r.get('status') in {'success','failed'} and r.get('record_type')!='format_recovery'),
-                'ambiguous_inflight_attempts':sum(status=='started' for status in {r.get('run_key'):r.get('status') for r in judgments}.values())},
+                'ambiguous_inflight_attempts':ambiguous_inflight_attempts(judgments)},
         'limitations':['Empathy-only source population; other custom dimensions have agent review only, so independent human agreement estimates remain unavailable.',
                        'Agent review has unresolved reference-context, role/version and timepoint uncertainty; its ratings are separate from human gold.',
                        'Frozen custom empathy anchors differ from the upstream annotation examples; disagreement does not establish which judgment is correct.',
@@ -188,7 +226,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                        'Pairwise choices are not ordinal 1–5 scores and are not entered in the QWK heatmap.',
                        'Invalid JSON outputs are excluded from agreement metrics; format-related missingness may bias valid-sample estimates.',
                        'Human retest reliability is not a mathematical upper bound on judge agreement.']}
-    report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds,attempted)
+    report['prompt_selection']=select_on_development(cases,successful,config['providers'],references,rounds,attempted,seed=seed)
     apply_completion_scope(report,pairs)
     structured_retries=sum(row.get('status')=='success' and row.get('provider_metadata',{}).get('structured_output',False) for row in judgments)
     if structured_retries:
@@ -207,7 +245,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                                         -mean([r['absolute_error'] for r in by_case[cid]]),cid))[:20]
     write_jsonl(out/'disagreements.jsonl',[
         {'case_id':cid,'role':index[cid]['role'],'context':index[cid]['context'],
-         'response':index[cid]['response'],'source_rows':index[cid]['source_rows'],
+         'response':index[cid]['response'],'source_rows':index[cid].get('source_rows', []),
          'human_scores':references[cid],'judgments':by_case[cid],
          'review_status':'agent_review_complete' if report['agent_review_complete'] else 'agent_review_required'} for cid in worst])
     heatmap_svg(pointwise,out/'kappa.svg')
@@ -241,6 +279,8 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
                   f"Held-out test n={held['qwk']['n']}; QWK {interval(held['qwk'])}; Spearman {interval(held['spearman'])}.",
                   f"Comparison uses {selection['common_valid_case_count']} cases with valid outputs from every judge/style; missing-output cases are excluded equally. This conditioning can affect representativeness.",
                   'This selection does not establish superiority on other dimensions or populations.']
+    elif selection['state']=='no_valid_development_qwk':
+        lines += ['', 'No judge/style had a defined development Empathy QWK; prompt selection skipped.']
     else:
         lines += ['', 'Prompt selection waits for all pointwise requests.']
     lines += ['', '## Inference format outcomes', '',
@@ -250,7 +290,7 @@ def build_report(cases,pairs,judgments,annotations,config,outdir):
         lines.append(f"| {provider} | {stats['first_attempt_successes']} | {stats['first_attempt_failures']} | {stats['retry_attempts']} | {stats['format_recoveries']} |")
     lines+=['','## Execution changes','']+[f'- {s}' for s in report['execution_changes']]
     lines+=['','![QWK](kappa.svg)','','![Position bias](position-bias.svg)','','![Length bias](length-bias.svg)','']+review_scope_lines(report)+['','## Limitations','']+[f'- {s}' for s in report['limitations']]
-    (out/'report.md').write_text('\n'.join(lines)+'\n')
+    (out/'report.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
     return report
 
 
