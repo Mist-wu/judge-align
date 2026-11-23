@@ -1,18 +1,20 @@
 """Reproducible prepare -> requests -> run -> report command line."""
 import argparse
+from collections import Counter, defaultdict
 import fcntl
 import json
-import os
 import sys
+import uuid
 from pathlib import Path
 from .data import annotation_template,fetch,prepare,validate_annotations
-from .io import append_jsonl,atomic_json,digest,metadata,now,read_jsonl,write_jsonl
+from .io import append_jsonl,digest,metadata,now,read_jsonl,write_jsonl
+from .ledger import ambiguous_inflight_attempts,inference_identity
 from .prompts import make_requests,parse_response
-from .providers import ProviderError,estimated_cost,make_provider,resolve_model
+from .providers import ProviderError,UnknownBillingError,estimated_cost,make_provider,resolve_model
 from .report import build_report
 
 
-def run_requests(config,requests,output,provider_name,retry_unknown=False,provider_factory=make_provider):
+def run_requests(config,requests,output,provider_name,retry_unknown=False,provider_factory=make_provider,reuse_prior_success=False):
     if provider_name not in config['providers']:
         raise ValueError('Unknown provider')
     cfg=dict(config['providers'][provider_name]);cfg['model']=resolve_model(cfg)
@@ -23,23 +25,41 @@ def run_requests(config,requests,output,provider_name,retry_unknown=False,provid
     except BlockingIOError:
         lock.close();raise ValueError('Another process owns this output; refusing concurrent paid calls') from None
     try:
+        scoped=[request for request in requests if request['provider']==provider_name]
+        seen=set()
+        for request in scoped:
+            if request['request_id'] in seen:
+                raise ValueError(f"Duplicate request in one invocation: {request['request_id']}")
+            seen.add(request['request_id'])
         existing=read_jsonl(output)
-        states={row['run_key']:row['status'] for row in existing}
-        completed={(row['request_id'],row.get('requested_model')) for row in existing if row['status']=='success'}
-        failure_counts={}
+        successes = defaultdict(list)
+        failure_counts = Counter()
         for row in existing:
-            if row['status']=='failed':failure_counts[row['run_key']]=failure_counts.get(row['run_key'],0)+1
+            if row['status'] == 'success':
+                identities = successes[row['request_id'], row.get('requested_model')]
+                if 'inference_identity' in row:
+                    identities.append(row['inference_identity'])
+            elif row['status'] == 'failed':
+                failure_counts[row['run_key']] += 1
+        current_identity=inference_identity(cfg)
         pending=[]
-        for request in requests:
-            if request['provider']!=provider_name:continue
+        exhausted = 0
+        for request in scoped:
             key=digest([request['request_id'],cfg])
-            if (request['request_id'],cfg['model']) in completed:continue
-            if states.get(key)=='started' and not retry_unknown:
+            identity_key=(request['request_id'],cfg['model'])
+            if identity_key in successes:
+                if not reuse_prior_success and any(item != current_identity for item in successes[identity_key]):
+                    raise ValueError('Inference config changed since a recorded success; pass --reuse-prior-success to reuse the old result')
+                continue
+            request_id = request['request_id']
+            related = (row for row in existing if row.get('request_id') == request_id or row.get('run_key') == key)
+            if not retry_unknown and ambiguous_inflight_attempts(related):
                 raise ValueError('Unfinished provider request has unknown billing outcome; inspect ledger before --retry-unknown')
-            if failure_counts.get(key,0)>=3:continue
+            if failure_counts[key] >= 3:
+                exhausted += 1
+                continue
             pending.append((key,request))
         if not pending:
-            exhausted=sum(states.get(digest([r['request_id'],cfg]))=='failed' for r in requests if r['provider']==provider_name)
             if exhausted:raise ValueError(f'{exhausted} requests exhausted retries; investigate failures')
             return {'attempted':0,'succeeded':0,'remaining':0}
         provider=provider_factory(cfg)
@@ -47,7 +67,7 @@ def run_requests(config,requests,output,provider_name,retry_unknown=False,provid
         attempted=succeeded=0
         for key,request in pending:
             base={k:v for k,v in request.items() if k!='messages'}
-            base.update({'run_key':key,'requested_model':cfg['model'],'provider_config_sha256':digest(cfg),'metadata':meta})
+            base.update({'run_key':key,'attempt_id':uuid.uuid4().hex,'requested_model':cfg['model'],'provider_config_sha256':digest(cfg),'inference_identity':current_identity,'metadata':meta})
             append_jsonl(output,{**base,'status':'started','started_at':now()})
             attempted+=1
             usage={};model_meta={};raw=None
@@ -57,6 +77,10 @@ def run_requests(config,requests,output,provider_name,retry_unknown=False,provid
                 append_jsonl(output,{**base,'status':'success','ended_at':now(),'result':result,
                     'usage':usage,'provider_metadata':model_meta,'estimated_cost_usd':estimated_cost(usage,cfg),'raw_output':raw})
                 succeeded+=1
+            except UnknownBillingError:
+                # Preserve the 'started' ledger state so subsequent runs refuse
+                # to resend ambiguous-billing calls without --retry-unknown.
+                raise
             except Exception as exc:
                 # No untrusted exception body/URL is printed: URLs may contain credentials.
                 safe_error=str(exc) if isinstance(exc,ProviderError) else type(exc).__name__
@@ -78,7 +102,7 @@ def parser():
     prep.add_argument('--cases',default='data/cases.jsonl');prep.add_argument('--pairs',default='data/pairs.jsonl')
     req=sub.add_parser('requests');req.add_argument('--config',default='configs/main.json');req.add_argument('--cases',default='data/cases.jsonl');req.add_argument('--pairs',default='data/pairs.jsonl');req.add_argument('--output',default='data/requests.jsonl')
     ann=sub.add_parser('annotations');ann.add_argument('--cases',default='data/cases.jsonl');ann.add_argument('--pairs',default='data/pairs.jsonl');ann.add_argument('--output',default='data/human-template.jsonl');ann.add_argument('--validate');ann.add_argument('--round',choices=['initial','retest'],default='initial')
-    run=sub.add_parser('run');run.add_argument('--config',default='configs/main.json');run.add_argument('--requests',default='data/requests.jsonl');run.add_argument('--provider',required=True);run.add_argument('--output',required=True);run.add_argument('--retry-unknown',action='store_true')
+    run=sub.add_parser('run');run.add_argument('--config',default='configs/main.json');run.add_argument('--requests',default='data/requests.jsonl');run.add_argument('--provider',required=True);run.add_argument('--output',required=True);run.add_argument('--retry-unknown',action='store_true');run.add_argument('--reuse-prior-success',action='store_true')
     rep=sub.add_parser('report');rep.add_argument('--config',default='configs/main.json');rep.add_argument('--cases',default='data/cases.jsonl');rep.add_argument('--pairs',default='data/pairs.jsonl');rep.add_argument('--judgments',nargs='+',required=True);rep.add_argument('--human');rep.add_argument('--outdir',default='results')
     return p
 
@@ -104,12 +128,13 @@ def main(argv=None):
                 if args.round=='retest':
                     # Use fixed seed, hide original scores, choose exactly 50 when available.
                     import random
-                    rows=random.Random(43).sample([r for r in rows if r['kind']=='pointwise'],min(50,sum(r['kind']=='pointwise' for r in rows)))
+                    pointwise_rows=[r for r in rows if r['kind']=='pointwise']
+                    rows=random.Random(43).sample(pointwise_rows,min(50,len(pointwise_rows)))
                 write_jsonl(args.output,rows);print(json.dumps({'annotation_tasks':len(rows)}))
         elif args.command=='run':
             cfg=json.loads(Path(args.config).read_text());rows=read_jsonl(args.requests)
             if not rows:raise ValueError('No requests; run requests first')
-            outcome=run_requests(cfg,rows,args.output,args.provider,args.retry_unknown)
+            outcome=run_requests(cfg,rows,args.output,args.provider,args.retry_unknown,reuse_prior_success=args.reuse_prior_success)
             print(json.dumps(outcome))
             if outcome['attempted']!=outcome['succeeded']:return 1
         elif args.command=='report':

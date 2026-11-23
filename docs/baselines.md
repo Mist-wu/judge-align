@@ -1,6 +1,6 @@
 # E4 baselines and source boundaries
 
-Checked 2026-11-04. Formal API judging is running on AWS; current counts are recorded in the server snapshot `docs/formal-progress.json`.
+Checked 2026-11-04. Formal automated judging is complete (3,000 requests executed, 2,971 analyzable outputs); final counts and statistics are recorded in `results/formal-summary.json` and `results/report.md`.
 
 | Source | Published finding | How used here |
 |---|---|---|

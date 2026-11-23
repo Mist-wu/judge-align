@@ -6,7 +6,7 @@ from datetime import datetime
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
-from .io import atomic_json, digest, now, write_jsonl
+from .io import atomic_json, digest, now
 
 SOURCE_COMMIT = "c3d44a6fc1790cc8c4b2fd7c01f0c72930655e0c"
 SOURCE_BASE = f"https://raw.githubusercontent.com/morecry/CharacterEval/{SOURCE_COMMIT}/"
@@ -101,15 +101,17 @@ def prepare(raw_dir, count=200, seed=42):
             context_id = digest([row["role"], row["context"]])[:24]
             alternatives[context_id][text] = name
     pairs, extra = [], {}
+    selected_ids = {row["id"] for row in selected}
     for row in selected:
         choices = sorted((text, filename) for text, filename in alternatives[row["context_id"]].items() if text != row["response"])
         if not choices:
             continue
         text, filename = choices[0]
         cid = case_id(row["role"], row["context"], text)
-        extra[cid] = {**row, "id": cid, "response": text, "human_scores": {}, "source_scores": {},
-            "source_rows": [], "primary": False, "human_provenance": None,
-            "human_pending": list(DIMENSIONS), "candidate_source": filename}
+        if cid not in selected_ids:
+            extra[cid] = {**row, "id": cid, "response": text, "human_scores": {}, "source_scores": {},
+                "source_rows": [], "primary": False, "human_provenance": None,
+                "human_pending": list(DIMENSIONS), "candidate_source": filename}
         pairs.append({"id": digest([row["id"], cid])[:24], "context_id": row["context_id"],
                       "a_id": row["id"], "b_id": cid, "human_winners": {}, "human_pending": list(DIMENSIONS)})
     return selected + list(extra.values()), pairs
@@ -152,13 +154,13 @@ def validate_annotations(rows, cases, pairs):
             raise ValueError("Annotation round must be initial or retest")
         try:
             annotated_at = datetime.fromisoformat(row["annotated_at"].replace("Z", "+00:00"))
-        except (TypeError, ValueError):
+        except (AttributeError, TypeError, ValueError):
             raise ValueError("annotated_at must be an ISO timestamp") from None
         if annotated_at.tzinfo is None:
             raise ValueError("annotated_at must include a timezone")
         dates.setdefault((kind, row["id"], row["annotator"]), {})[row["round"]] = annotated_at
-        values = row.get("scores" if kind == "pointwise" else "winners", {})
-        if set(values) != set(DIMENSIONS):
+        values = row.get("scores" if kind == "pointwise" else "winners")
+        if not isinstance(values, dict) or set(values) != set(DIMENSIONS):
             raise ValueError("Annotate all four dimensions explicitly")
         for value in values.values():
             if kind == "pointwise":

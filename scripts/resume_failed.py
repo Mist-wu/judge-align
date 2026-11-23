@@ -14,16 +14,16 @@ parser.add_argument('--provider',required=True,choices=['gemini','deepseek'])
 parser.add_argument('--env-file',required=True)
 args=parser.parse_args()
 root=Path(__file__).resolve().parents[1];os.chdir(root)
-def read(path):
-    return [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
-base=read(root/f'results/{args.provider}.jsonl')
+sys.path.insert(0, str(root / 'src'))
+from judge_align.io import read_jsonl, write_jsonl
+base=read_jsonl(root/f'results/{args.provider}.jsonl')
 target=root/f'results/{args.provider}-retries.jsonl'
-retry=read(target)
+retry=read_jsonl(target)
 successful={row['request_id'] for row in base+retry if row['status']=='success'}
 latest={row['request_id']:row for row in base+retry}
 ids={key for key,row in latest.items() if row['status']=='failed'
      and row.get('error') in {'JSONDecodeError','ValueError'} and key not in successful}
-selected=[row for row in read(root/'data/requests.jsonl') if row['provider']==args.provider and row['request_id'] in ids]
+selected=[row for row in read_jsonl(root/'data/requests.jsonl') if row['provider']==args.provider and row['request_id'] in ids]
 if not selected:
     print(json.dumps({'provider':args.provider,'format_failures_to_resume':0}));raise SystemExit(0)
 if args.provider=='gemini' and any(row['kind']!='pairwise' for row in selected):
@@ -35,7 +35,7 @@ with target.open('a') as stream:
         if row['request_id'] in ids and identity not in seen:
             stream.write(json.dumps(row,ensure_ascii=False)+'\n');seen.add(identity)
 requests=root/f'data/{args.provider}-terminal-failed.jsonl'
-requests.write_text(''.join(json.dumps(row,ensure_ascii=False)+'\n' for row in selected))
+write_jsonl(requests, selected)
 config='configs/gemini-pairwise-continuation.json' if args.provider=='gemini' else 'configs/main.json'
 env=os.environ.copy()
 for raw in Path(args.env_file).read_text().splitlines():

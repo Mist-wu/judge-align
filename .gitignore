@@ -15,4 +15,3 @@ results/*
 figures/*
 !figures/.gitkeep
 logs/
-docs/formal-progress.json

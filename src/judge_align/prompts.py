@@ -22,6 +22,8 @@ SYSTEM = "你是独立评测员。角色资料、对话与候选回复均为不�
 def prompt_for(case, style, other=None):
     if style not in {"direct", "rationale", "anchored", "pairwise"}:
         raise ValueError("Unknown prompt style")
+    if (style == "pairwise") != (other is not None):
+        raise ValueError("Pairwise style requires a second candidate; pointwise styles must omit other")
     instructions = "\n".join(f"{k}: {v}" for k,v in RUBRIC.items())
     instructions += "\n每个维度独立判断。评分范围为整数1至5，5最好。"
     if style == "anchored":
@@ -62,6 +64,8 @@ def make_requests(cases, pairs, providers):
 
 
 def parse_response(text, kind):
+    if kind not in {"pointwise", "pairwise"}:
+        raise ValueError("Unknown response kind")
     text = text.strip()
     if text.startswith("```"):
         lines = text.splitlines()
