@@ -4,9 +4,8 @@ import json
 from pathlib import Path
 import subprocess
 import sys
-from datetime import datetime,timezone
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
-from judge_align.io import digest,read_jsonl,write_jsonl
+from judge_align.io import digest,now,read_jsonl,write_jsonl
 from judge_align.prompts import parse_response
 
 def normalize_trailing_commas(text):
@@ -39,14 +38,14 @@ for row in rows:
     except (ValueError,TypeError):continue
     recovered.append({**row,'status':'success','record_type':'format_recovery','result':result,
         'source_failure_sha256':digest(row),'source_ended_at':row['ended_at'],
-        'ended_at':datetime.now(timezone.utc).isoformat(),'usage':{},'estimated_cost_usd':None,
+        'ended_at':now(),'usage':{},'estimated_cost_usd':None,
         'normalized_output':normalized,'error':None,
         'recovery':{'method':'Remove commas immediately before closing object/array outside quoted strings only',
                     'removed_commas':removed,'git_commit':commit,'new_model_requests':0,
                     'note':'Original raw output, parse failure, and token usage remain in source ledger; no score or reason text changed.'}})
     successful.add(row['request_id'])
 write_jsonl(output,recovered)
-receipt={'at':datetime.now(timezone.utc).isoformat(),'source':str(source),'output':str(output),
+receipt={'at':now(),'source':str(source),'output':str(output),
          'format_recoveries':len(recovered),'new_model_requests':0,'status':'offline_format_processing_complete'}
 Path('results/qwen-format-recovery.json').write_text(json.dumps(receipt,indent=2)+'\n')
 print(json.dumps(receipt))

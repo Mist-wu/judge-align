@@ -50,7 +50,7 @@ Qwen 约一半的判断会随位置改变，Gemini 最稳定。
 - 请求在发送前先落盘，重启后跳过已成功的请求，不重复计费。输出文件加排他锁。
 - 鉴权、网络等错误会让当前 provider 停下，不继续消耗剩下的队列。每条请求最多记录 3 次失败。
 - 格式失败、截断和重试全部保留在账本里，不静默丢样本。
-- Qwen 拒绝超长输入，不静默截断。
+- Qwen 拒绝超长输入。单条和批量生成的输出 token 数都计入首个 EOS，排除其后的补齐 token。
 - API 按公开价估算总花费 3.58 美元，逐项见 [cost.md](docs/cost.md)。
 
 ## 运行
@@ -78,6 +78,8 @@ python3 scripts/run.py report --judgments results/final-delivery/deepseek.jsonl 
   results/final-delivery/gemini.jsonl results/final-delivery/qwen.jsonl
 python3 scripts/reconcile_cost.py --results results/final-delivery
 ```
+
+报告在输出目录生成三张内嵌 SVG。README 的汇总图由 `python scripts/plot_results.py` 读取 `results/formal-summary.json` 后生成，需安装 `.[plots]`。
 
 ## 来源
 

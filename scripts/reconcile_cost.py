@@ -7,12 +7,15 @@ import json
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+from judge_align.io import now
 from judge_align.ledger import ambiguous_inflight_attempts
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--results', default='results')
 args = parser.parse_args()
 root = Path(args.results)
+window_start = datetime(2026, 11, 4, 10, tzinfo=timezone.utc)
+window_end = datetime(2026, 11, 5, tzinfo=timezone.utc)
 providers = {}
 for name in ('deepseek', 'gemini'):
     rows = [json.loads(line) for line in (root / f'{name}.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
@@ -40,7 +43,7 @@ for name in ('deepseek', 'gemini'):
         ended = datetime.fromisoformat(row['ended_at'].replace('Z', '+00:00'))
         # All actual campaign calls occur after the published weekday peak window.
         # This historical reconciliation deliberately does not guess future prices.
-        if ended.date().isoformat() != '2026-11-04' or ended.hour < 10:
+        if ended.tzinfo is None or not window_start <= ended < window_end:
             unknown += 1
             continue
         if name == 'deepseek' and row['requested_model'] == 'deepseek-flash':
@@ -54,7 +57,7 @@ for name in ('deepseek', 'gemini'):
                        'unknown_cost_terminal_attempts': unknown,
                        'currently_inflight_attempts': ambiguous_inflight_attempts(rows)}
 report = {
-    'created_at': datetime.now(timezone.utc).isoformat(),
+    'created_at': now(),
     'pricing_verified_at': '2026-11-04',
     'pricing_scope': '2026-11-04 10:00-24:00 UTC; standard paid Gemini and off-peak DeepSeek',
     'providers': providers,

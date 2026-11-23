@@ -120,16 +120,8 @@ class QwenProvider:
                   "model_commit":getattr(self.model.config,"_commit_hash",None),"quantization":"bitsandbytes nf4 4-bit"}
 
     def generate(self,messages):
-        import torch
-        inputs=self.tokenizer.apply_chat_template(messages,tokenize=True,add_generation_prompt=True,return_tensors="pt",return_dict=True).to(self.model.device)
-        length=inputs["input_ids"].shape[-1]
-        maximum=self.config.get("max_input_tokens",8192)
-        if length>maximum:
-            raise ProviderError(f"Input has {length} tokens, exceeds configured {maximum}; no silent truncation")
-        with torch.inference_mode():
-            outputs=self.model.generate(**inputs,max_new_tokens=self.config.get("max_output_tokens",1536),do_sample=False,pad_token_id=self.tokenizer.eos_token_id)
-        continuation=outputs[0,length:]
-        return self.tokenizer.decode(continuation,skip_special_tokens=True),{"input_tokens":length,"output_tokens":len(continuation),"cached_input_tokens":0},{"model":self.model_name,**self.env}
+        text, usage, _ = self.generate_batch([messages])[0]
+        return text, usage, {"model": self.model_name, **self.env}
 
     def generate_batch(self,conversations):
         import torch
@@ -148,6 +140,7 @@ class QwenProvider:
         eos=set(eos if isinstance(eos,list) else [eos])
         result=[]
         for length,sequence in zip(lengths,outputs[:,width:].tolist()):
+            # Count the first generated EOS, excluding any padding after it.
             end=next((i+1 for i,token in enumerate(sequence) if token in eos),len(sequence))
             tokens=sequence[:end]
             result.append((self.tokenizer.decode(tokens,skip_special_tokens=True),

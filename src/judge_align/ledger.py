@@ -1,4 +1,5 @@
 """Pair provider attempts without letting an older terminal row close a later try."""
+from collections import defaultdict
 
 
 def inference_identity(config):
@@ -31,54 +32,24 @@ def ambiguous_inflight_attempts(rows):
     a start recorded after it. Rows without timestamps pair by count so the
     result does not depend on file order.
     """
-    groups = {}
-    order = []
-    for index, row in enumerate(rows):
-        if row.get('record_type') == 'format_recovery':
-            continue
+    starts, terminals = set(), set()
+    legacy = defaultdict(list)
+    for row in rows:
         status = row.get('status')
-        if status not in {'started', 'success', 'failed'}:
+        if row.get('record_type') == 'format_recovery' or status not in {'started', 'success', 'failed'}:
             continue
-        attempt = row.get('attempt_id')
-        if attempt:
-            key = ('attempt', attempt)
+        started = status == 'started'
+        if attempt := row.get('attempt_id'):
+            (starts if started else terminals).add(attempt)
         elif row.get('run_key') is not None:
-            key = ('legacy', row.get('run_key'))
-        else:
-            continue
-        if key not in groups:
-            groups[key] = []
-            order.append(key)
-        groups[key].append((index, row))
-    return sum(_open_count(key, groups[key]) for key in order)
+            legacy[row['run_key']].append((_event_time(row), started))
 
-
-def _open_count(key, items):
-    if key[0] == 'attempt':
-        started = any(row.get('status') == 'started' for _, row in items)
-        terminal = any(row.get('status') in {'success', 'failed'} for _, row in items)
-        return int(started and not terminal)
-    timed = []
-    untimed_started = untimed_terminal = 0
-    for index, row in items:
-        stamp = _event_time(row)
-        if stamp is None:
-            if row.get('status') == 'started':
-                untimed_started += 1
-            else:
-                untimed_terminal += 1
-        else:
-            timed.append((stamp, index, row))
-    open_starts = []
-    for stamp, _index, row in sorted(timed, key=lambda item: (item[0], item[1])):
-        if row.get('status') == 'started':
-            open_starts.append(stamp)
-            continue
-        close_at = None
-        for position in range(len(open_starts) - 1, -1, -1):
-            if open_starts[position] <= stamp:
-                close_at = position
-                break
-        if close_at is not None:
-            open_starts.pop(close_at)
-    return len(open_starts) + max(0, untimed_started - untimed_terminal)
+    unresolved = len(starts - terminals)
+    for events in legacy.values():
+        untimed = sum(1 if started else -1 for stamp, started in events if stamp is None)
+        open_count = 0
+        # Stable ordering preserves ledger order when timestamps are equal.
+        for stamp, started in sorted((e for e in events if e[0] is not None), key=lambda e: e[0]):
+            open_count = open_count + 1 if started else max(0, open_count - 1)
+        unresolved += open_count + max(0, untimed)
+    return unresolved

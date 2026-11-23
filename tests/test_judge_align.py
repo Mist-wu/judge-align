@@ -1,6 +1,4 @@
 import json
-import math
-import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -341,12 +339,11 @@ class ReportTests(unittest.TestCase):
                 build_report([a,b],[pair],swapped,[],cfg(),d)
     def test_reconcile_counts_open_retry(self):
         import subprocess
-        a,b=case(),case('c2','别来烦我。',False)
-        pair={'id':'p','a_id':'c1','b_id':'c2','context_id':'context1','human_winners':{}}
-        reqs=list(make_requests([a,b],[pair],['fake']))
-        failed=[{**q,'run_key':q['request_id'],'status':'failed'} for q in reqs]
-        started={**failed[0],'status':'started'}
-        rows=[{**started,'started_at':'2026-11-04T10:00:00Z'},{**failed[0],'ended_at':'2026-11-04T10:00:01Z'},{**started,'started_at':'2026-11-04T10:00:02Z'}]
+        rows = [
+            {'status': 'started', 'run_key': 'retry', 'started_at': '2026-11-04T10:00:00Z'},
+            {'status': 'failed', 'run_key': 'retry', 'ended_at': '2026-11-04T10:00:01Z'},
+            {'status': 'started', 'run_key': 'retry', 'started_at': '2026-11-04T10:00:02Z'},
+        ]
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)
             write_jsonl(root/'deepseek.jsonl',rows)

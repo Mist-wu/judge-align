@@ -1,5 +1,6 @@
 """Reproducible prepare -> requests -> run -> report command line."""
 import argparse
+from collections import Counter, defaultdict
 import fcntl
 import json
 import sys
@@ -31,31 +32,34 @@ def run_requests(config,requests,output,provider_name,retry_unknown=False,provid
                 raise ValueError(f"Duplicate request in one invocation: {request['request_id']}")
             seen.add(request['request_id'])
         existing=read_jsonl(output)
-        completed={(row['request_id'],row.get('requested_model')) for row in existing if row['status']=='success'}
-        identities={}
+        successes = defaultdict(list)
+        failure_counts = Counter()
         for row in existing:
-            if row['status']=='success' and 'inference_identity' in row:
-                identities.setdefault((row.get('request_id'),row.get('requested_model')),[]).append(row['inference_identity'])
-        failure_counts={}
-        for row in existing:
-            if row['status']=='failed':failure_counts[row['run_key']]=failure_counts.get(row['run_key'],0)+1
+            if row['status'] == 'success':
+                identities = successes[row['request_id'], row.get('requested_model')]
+                if 'inference_identity' in row:
+                    identities.append(row['inference_identity'])
+            elif row['status'] == 'failed':
+                failure_counts[row['run_key']] += 1
         current_identity=inference_identity(cfg)
         pending=[]
+        exhausted = 0
         for request in scoped:
             key=digest([request['request_id'],cfg])
             identity_key=(request['request_id'],cfg['model'])
-            if identity_key in completed:
-                recorded=identities.get(identity_key,[])
-                if recorded and any(item!=current_identity for item in recorded) and not reuse_prior_success:
+            if identity_key in successes:
+                if not reuse_prior_success and any(item != current_identity for item in successes[identity_key]):
                     raise ValueError('Inference config changed since a recorded success; pass --reuse-prior-success to reuse the old result')
                 continue
-            related=[row for row in existing if row.get('request_id')==request['request_id'] or row.get('run_key')==key]
-            if ambiguous_inflight_attempts(related) and not retry_unknown:
+            request_id = request['request_id']
+            related = (row for row in existing if row.get('request_id') == request_id or row.get('run_key') == key)
+            if not retry_unknown and ambiguous_inflight_attempts(related):
                 raise ValueError('Unfinished provider request has unknown billing outcome; inspect ledger before --retry-unknown')
-            if failure_counts.get(key,0)>=3:continue
+            if failure_counts[key] >= 3:
+                exhausted += 1
+                continue
             pending.append((key,request))
         if not pending:
-            exhausted=sum((r['request_id'],cfg['model']) not in completed and failure_counts.get(digest([r['request_id'],cfg]),0)>=3 for r in scoped)
             if exhausted:raise ValueError(f'{exhausted} requests exhausted retries; investigate failures')
             return {'attempted':0,'succeeded':0,'remaining':0}
         provider=provider_factory(cfg)

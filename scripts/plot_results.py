@@ -16,7 +16,7 @@ report=json.loads(Path(args.summary).read_text())
 out=Path(args.outdir);out.mkdir(parents=True,exist_ok=True)
 providers=list(dict.fromkeys(r['provider'] for r in report['pointwise']));styles=['direct','rationale','anchored']
 point={(r['provider'],r['style']):r for r in report['pointwise'] if r['dimension']=='empathy'}
-grid=np.array([[np.nan if point[(provider,style)]['qwk']['value'] is None else point[(provider,style)]['qwk']['value'] for style in styles] for provider in providers],dtype=float)
+grid=np.array([[point[(provider,style)]['qwk']['value'] for style in styles] for provider in providers],dtype=float)
 plt.rcParams.update({'font.size':10,'svg.fonttype':'none','savefig.facecolor':'white'})
 fig,(left,right)=plt.subplots(1,2,figsize=(12,4.8),gridspec_kw={'width_ratios':[1,1.25]},layout='constrained')
 heat=left.imshow(grid,cmap='RdBu',vmin=-1,vmax=1,aspect='auto')
@@ -55,6 +55,7 @@ right.set_xlabel('Fraction of canonical outcomes changed (including ties)')
 right.set_title('Position sensitivity after A/B swap\nOnly complete A/B swaps; 95% conversation-group CI',fontsize=11)
 right.grid(axis='x',alpha=.2);right.set_axisbelow(True);right.legend(loc='lower right',frameon=False)
 fig.suptitle(f"E4 judge alignment — {report['attempted_requests']:,} requests executed, {report['successful_requests']:,} analyzable outputs",fontsize=14)
-for suffix in ['png','svg','pdf']:
-    fig.savefig(out/f'formal-comparison.{suffix}',dpi=200)
-print(json.dumps({'figures':[str(out/f'formal-comparison.{suffix}') for suffix in ['png','svg','pdf']]}))
+figures = [out / f'formal-comparison.{suffix}' for suffix in ('png', 'svg', 'pdf')]
+for path in figures:
+    fig.savefig(path, dpi=200)
+print(json.dumps({'figures': [str(path) for path in figures]}))
